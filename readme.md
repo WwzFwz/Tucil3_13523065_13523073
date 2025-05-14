@@ -1,6 +1,6 @@
-    #  Puzzle Rush Hour 
+#  Puzzle Rush Hour 
 
-![ Puzzle Rush Hour ](doc/alfi.png)
+[ Puzzle Rush Hour ](doc/alfi.png)
 
 ## Deskripsi Program
 Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang menggunakan **algoritma Path Finding** dengan teknik . Program ini memiliki fitur utama sebagai berikut:
@@ -51,7 +51,7 @@ cd src
 mvn clean package
 ```
 
-atau bisa ajuga
+atau bisa juga
 ```
 java --module-path "C:\Program Files\Java\javafx-sdk-21.0.3\lib" \
      --add-modules javafx.controls,javafx.fxml \
