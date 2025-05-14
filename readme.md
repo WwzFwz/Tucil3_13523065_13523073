@@ -92,7 +92,7 @@ Tuci3_13523065_13523073
 | **NIM**  | **Nama Anggota**               | **Github** |
 | -------- | ------------------------------ | ---------- |
 | 13523065 | Dzaky Aurelia Fawwaz           | [WwzFwz](https://github.com/WwzFwz) |
-| 13523091 | Alfian Hanif                   | [AlfianHanifFY](https://github.com/AlfianHanifFY) | 
+| 13523073 | Alfian Hanif                   | [AlfianHanifFY](https://github.com/AlfianHanifFY) | 
 
 
 ## References
