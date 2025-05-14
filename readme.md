@@ -84,7 +84,7 @@ Tuci3_13523065_13523073
 │     │     ├── resources/com/jawa  #Resource gui (css,fxml)
 ├── test/
 │     ├── input/        # Input percobaan puzzle dalam txt
-│     ├── output/       # Putput Hasil percobaan
+│     ├── output/       # Output Hasil percobaan
 ```
 
 ## Contributors
