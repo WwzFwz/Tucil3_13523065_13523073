@@ -33,12 +33,9 @@ cd src
 ```
 3. Jalankan perintah ini
 ```
-mvn clean package
+mvn clean javafx:run
 ```
-4. Jalankan Jar
-```
-java -jar target/myjavafxapp-1.0-SNAPSHOT.jar
-```
+
 
 ## Cara Menjalankan Program 3 (Manual Menggunakan Executable JAR)
 1. Pastikan sudah mendownload requirement wajib
@@ -49,9 +46,14 @@ cd src
 3.  Buat jar 
 ```
 mvn clean package
-```
+``
 
-atau bisa juga
+4. Jalankan jar
+```
+java -jar target/myjavafxapp-1.0-SNAPSHOT.jar
+
+```
+atau bisa juga 
 ```
 java --module-path "C:\Program Files\Java\javafx-sdk-21.0.3\lib" \
      --add-modules javafx.controls,javafx.fxml \
