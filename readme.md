@@ -46,7 +46,7 @@ cd src
 3.  Buat jar 
 ```
 mvn clean package
-``
+```
 
 4. Jalankan jar
 ```
