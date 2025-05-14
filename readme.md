@@ -16,9 +16,9 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 - Extension Pack for Java 
 
 ## Requirements Wajib
-- JavaFX 
-- Java 23
-- Maven (Tidak perlu, kalau sudah pake extension)
+- JavaFX  (nanti kasih link zip / link)
+- Java 23 (nanti kasih zip / link)
+- Maven (Tidak perlu, kalau sudah pake extension)  (nanti kasih zip / link)
 
 ## Cara Menjalankan Program 1 (Jika menggunakan extension vs code)
 1. Pastikan suah mendownload requirement opsional
