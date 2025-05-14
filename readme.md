@@ -43,7 +43,7 @@ mvn clean javafx:run
 ```
 cd src
 ```
-3.  Buat jar 
+3.  Buat jar  (jika ingin buat ulang jar)
 ```
 mvn clean package
 ```
