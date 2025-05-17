@@ -1,21 +1,18 @@
 package com.jawa.model;
-
 import javafx.scene.paint.Color;
 
-public class Vehicle {
+public class Piece {
     private String id;
-    private int row;
-    private int col;
+    private final Position position;
     private int length;
     private boolean isHorizontal;
     private Color color;
     private boolean isPrimary;
     
 
-    public Vehicle(String id, int row, int col, int length, boolean isHorizontal, boolean isPrimary) {
+    public Piece(String id, int row, int col, int length, boolean isHorizontal, boolean isPrimary) {
         this.id = id;
-        this.row = row;
-        this.col = col;
+        this.position = new Position(row,col);
         this.length = length;
         this.isHorizontal = isHorizontal;
         this.isPrimary = isPrimary;
@@ -35,20 +32,18 @@ public class Vehicle {
     }
     
 
-    public Vehicle(String id, int row, int col, int length, boolean isHorizontal, boolean isPrimary, Color color) {
+    public Piece(String id, int row, int col, int length, boolean isHorizontal, boolean isPrimary, Color color) {
         this.id = id;
-        this.row = row;
-        this.col = col;
+        this.position = new Position(row,col);
         this.length = length;
         this.isHorizontal = isHorizontal;
         this.isPrimary = isPrimary;
         this.color = color;
     }
     
-    public Vehicle(Vehicle other) {
+    public Piece(Piece other) {
         this.id = other.id;
-        this.row = other.row;
-        this.col = other.col;
+        this.position = new Position(other.position);
         this.length = other.length;
         this.isHorizontal = other.isHorizontal;
         this.color = other.color;
@@ -58,11 +53,11 @@ public class Vehicle {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     
-    public int getRow() { return row; }
-    public void setRow(int row) { this.row = row; }
+    public int getRow() { return position.getRow() ; }
+    public void setRow(int row) { position.setRow(row); }
     
-    public int getCol() { return col; }
-    public void setCol(int col) { this.col = col; }
+    public int getCol() { return position.getCol(); }
+    public void setCol(int col) {  position.setCol(col);}
     
     public int getLength() { return length; }
     public void setLength(int length) { this.length = length; }
@@ -76,34 +71,35 @@ public class Vehicle {
     public boolean isPrimary() { return isPrimary; }
     public void setPrimary(boolean primary) { isPrimary = primary; }
 
-    public void move(String direction, int distance) {
+    public Movement move(String direction, int distance) {
         switch (direction) {
             case "R": 
                 if (isHorizontal) {
-                    col += distance;
+                     setCol(getCol()+distance);
                 }
                 break;
             case "L": 
                 if (isHorizontal) {
-                    col -= distance;
+                    setCol((getCol()-distance));
                 }
                 break;
             case "U": 
                 if (!isHorizontal) {
-                    row -= distance;
+                    setRow(getRow()-distance);
                 }
                 break;
             case "D": 
                 if (!isHorizontal) {
-                    row += distance;
+                    setRow(getRow()+ distance);
                 }
                 break;
         }
+        return new Movement(getId(),direction,distance);
     }
     
     @Override
     public String toString() {
-        return id + " at (" + row + "," + col + "), length=" + length + 
+        return id + " at (" + getRow() + "," + getCol() + "), length=" + length + 
                ", " + (isHorizontal ? "horizontal" : "vertical") +
                (isPrimary ? " (Primary)" : "");
     }
