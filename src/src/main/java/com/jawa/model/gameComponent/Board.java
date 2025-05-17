@@ -1,10 +1,16 @@
 package com.jawa.model.gameComponent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Board {
     private int rows;
     private int cols;
+    private int countPiece;
     private Map<String, Piece> pieces; // key = piece_id
     private Position exitPosition;
 
@@ -33,15 +39,17 @@ public class Board {
         return ANSI_COLORS[idx] + ch + "\u001B[0m";
     }
 
-    public Board(int _rows, int _cols) {
-        this.rows = _rows;
-        this.cols = _cols;
+    public Board(int rows, int cols ,int countPiece) {
+        this.rows = rows;
+        this.cols = cols;
+        this.countPiece = countPiece;
         this.pieces = new HashMap<>();
     }
 
     public Board(Board other) {
         this.rows = other.rows;
         this.cols = other.cols;
+        this.countPiece = other.countPiece;
         this.exitPosition = other.exitPosition != null ? new Position(other.exitPosition) : null;
         this.pieces = new HashMap<>();
         for (Map.Entry<String, Piece> e : other.pieces.entrySet()) {
@@ -295,7 +303,7 @@ public class Board {
     }
 
     public Board deepCopy() {
-        Board copy = new Board(this.rows, this.cols);
+        Board copy = new Board(this.rows, this.cols , this.countPiece);
         copy.setExitPosition(new Position(this.exitPosition)); // pastikan Position juga punya copy constructor
 
         for (Piece p : this.pieces.values()) {
@@ -303,4 +311,12 @@ public class Board {
         }
         return copy;
     }
+    public Position getFinishPosition() {
+        return exitPosition;
+    }
+    
+    public void setFinishPosition(Position exitPosition) {
+        this.exitPosition = exitPosition;
+    }
+    
 }

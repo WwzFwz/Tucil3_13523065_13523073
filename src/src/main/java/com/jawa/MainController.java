@@ -1,5 +1,10 @@
 package com.jawa; 
 
+import java.io.File;
+
+import com.jawa.model.gameComponent.Board;
+import com.jawa.model.gameState.IO;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -12,6 +17,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
+
 public class MainController {
     @FXML
     private Button uploadButton;
@@ -50,7 +57,11 @@ public class MainController {
     private Pane boardPane;
     
     private boolean fileUploaded = false;
-
+    private File selectedFile;
+    private Board board;
+    public File getSelectedFile(){
+        return selectedFile;
+    }
     @FXML
     private void initialize() {
         initializeBoard(30, 30);
@@ -81,7 +92,6 @@ public class MainController {
         boardGrid.setHgap(2); 
         boardGrid.setVgap(2); 
         boardGrid.setPadding(new Insets(10));
-        
         double cellSize = calculateCellSize(rows, cols);
         
         for (int row = 0; row < rows; row++) {
@@ -180,12 +190,26 @@ public class MainController {
     }
     @FXML
     private void handleUploadFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Puzzle File");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+
+   
+        selectedFile = fileChooser.showOpenDialog(uploadButton.getScene().getWindow());
+        try {
+            board = IO.loadFromFile(getSelectedFile());
+        } catch (Exception e) {
+            fileNameLabel.setText("Error Occured : " + e);
+        }
+        initializeBoard(board.getRow(),board.getCol());
+            
         fileUploaded = true;
-        fileNameLabel.setText("File: " + "test.txt"); 
+        fileNameLabel.setText("File: " + selectedFile.getName()); 
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
-        initializeBoard(10, 10); // ukuran konfigurasi
     }
 
     @FXML   
