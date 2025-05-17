@@ -1,13 +1,17 @@
 package com.jawa; 
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Pagination;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 public class MainController {
     @FXML
     private Button uploadButton;
@@ -49,6 +53,8 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        initializeBoard(30, 30);
+
 
         algorithmComboBox.getItems().addAll(
             "A*", 
@@ -57,7 +63,7 @@ public class MainController {
         );
 
         algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            
+        
             // resetHeuristicAndSolveButton();
             
             updateHeuristicOptions(newValue);
@@ -70,56 +76,80 @@ public class MainController {
 
 
     }
-    
-private void updateHeuristicOptions(String algorithm) {
-    heuristicComboBox.getItems().clear();
-    heuristicComboBox.setValue(null);
-    
-    solveButton.setDisable(true);
-    
-    if (!fileUploaded) {
-        heuristicComboBox.setDisable(true);
-        heuristicComboBox.setPromptText("Upload File First");
-        return;
-    }
-    
-    if (algorithm == null) {
-        heuristicComboBox.setDisable(true);
-        heuristicComboBox.setPromptText("Select Algorithm First");
-        return;
-    }
-    switch (algorithm) {
-        case "A*":
-            heuristicComboBox.setDisable(false);
-            heuristicComboBox.setPromptText("Select Heuristic");
-            heuristicComboBox.getItems().addAll(
-                "Manhattan Distance", 
-                "Blocking Vehicles", 
-                "Advanced Blocking"
-            );
-            break;
-                
-        case "Greedy Best-First":
-            heuristicComboBox.setDisable(false);
-            heuristicComboBox.getItems().addAll(
-                "Manhattan Distance", 
-                "Blocking Vehicles"
-            );
-            break;
-                
-        case "Uniform-Cost Search":
-            heuristicComboBox.setDisable(true);
-            heuristicComboBox.setPromptText("No Heuristic Needed");
-            if (fileUploaded) {
-                solveButton.setDisable(false);
+    private void initializeBoard(int rows, int cols) {
+        boardPane.getChildren().clear();
+        
+        GridPane boardGrid = new GridPane();
+        boardGrid.setHgap(2); 
+        boardGrid.setVgap(2); 
+        boardGrid.setPadding(new Insets(10));
+        
+        double cellSize = calculateCellSize(rows, cols);
+        
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                StackPane cell = createCell(row, col, cellSize);
+                boardGrid.add(cell, col, row);
             }
-            break;
-                
-        default:
-            heuristicComboBox.setDisable(true);
-            heuristicComboBox.setPromptText("Unknown Algorithm");
+        }
+    
+        boardPane.getChildren().add(boardGrid);
+        
+        boardGrid.layoutXProperty().bind(
+                boardPane.widthProperty().subtract(boardGrid.widthProperty()).divide(2));
+        boardGrid.layoutYProperty().bind(
+                boardPane.heightProperty().subtract(boardGrid.heightProperty()).divide(2));
     }
-}
+
+    private void updateHeuristicOptions(String algorithm) {
+        heuristicComboBox.getItems().clear();
+        heuristicComboBox.setValue(null);
+        
+        solveButton.setDisable(true);
+        
+        if (!fileUploaded) {
+            heuristicComboBox.setDisable(true);
+            heuristicComboBox.setPromptText("Upload File First");
+            return;
+        }
+        
+        if (algorithm == null) {
+            heuristicComboBox.setDisable(true);
+            heuristicComboBox.setPromptText("Select Algorithm First");
+            return;
+        }
+        switch (algorithm) {
+            case "A*":
+                heuristicComboBox.setDisable(false);
+                heuristicComboBox.setPromptText("Select Heuristic");
+                heuristicComboBox.getItems().addAll(
+                    "Manhattan Distance", 
+                    "Blocking Vehicles", 
+                    "Advanced Blocking"
+                );
+                break;
+                    
+            case "Greedy Best-First":
+                heuristicComboBox.setDisable(false);
+                heuristicComboBox.getItems().addAll(
+                    "Manhattan Distance", 
+                    "Blocking Vehicles"
+                );
+                break;
+                    
+            case "Uniform-Cost Search":
+                heuristicComboBox.setDisable(true);
+                heuristicComboBox.setPromptText("No Heuristic Needed");
+                if (fileUploaded) {
+                    solveButton.setDisable(false);
+                }
+                break;
+                    
+            default:
+                heuristicComboBox.setDisable(true);
+                heuristicComboBox.setPromptText("Unknown Algorithm");
+        }
+    }
 
     private void updateSolveButtonState() {
 
@@ -214,6 +244,36 @@ private void updateHeuristicOptions(String algorithm) {
         
     //     System.out.println("dirsset");
     // }
+    private StackPane createCell(int row, int col, double size) {
+        Rectangle cellBg = new Rectangle(size, size);
+        cellBg.setFill(Color.web("#1a1158")); 
+        cellBg.setStroke(Color.web("#4287f5")); 
+        cellBg.setStrokeWidth(1.5); 
+        StackPane cell = new StackPane(cellBg);
+        cell.setId("cell_" + row + "_" + col);
+        return cell;
+    }
 
+    private double calculateCellSize(int rows, int cols) {
+        double availableWidth = boardPane.getWidth();
+        double availableHeight = boardPane.getHeight();
+        if (availableWidth <= 0) availableWidth = boardPane.getPrefWidth();
+        if (availableHeight <= 0) availableHeight = boardPane.getPrefHeight();
+        
+        if (availableWidth <= 0) availableWidth = 400;
+        if (availableHeight <= 0) availableHeight = 400;
+        
+        availableWidth -= 40; 
+        availableHeight -= 40; 
+        
+        double maxCellWidth = availableWidth / cols;
+        double maxCellHeight = availableHeight / rows;
+        
+        double cellSize = Math.min(maxCellWidth, maxCellHeight);
 
+        if (cellSize > 60) cellSize = 60; 
+
+        if (cellSize < 20) cellSize = 20; 
+        return cellSize;
+    }
 }

@@ -139,7 +139,7 @@
                   <Insets bottom="10.0" top="20.0" />
                </VBox.margin>
             </Label>
-            <Pane fx:id="boardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="board-pane" VBox.vgrow="ALWAYS">
+            <Pane fx:id="boardPane" minHeight="300.0" minWidth="300.0"  maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="board-pane" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
                </VBox.margin>
