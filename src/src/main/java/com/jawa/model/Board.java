@@ -5,6 +5,6 @@ import java.util.Map;
 public class Board {
     private int rows;
     private int cols;
-    private Map<String, Piece> pieces;
+    private Map<String, Piece> pieces;  // key = piece_id
     
 }
