@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import com.jawa.model.gameComponent.Board;
+import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 import com.jawa.model.gameState.IO;
@@ -205,7 +206,7 @@ public class MainController {
         try {
             board = IO.loadFromFile(getSelectedFile());
         } catch (Exception e) {
-            fileNameLabel.setText("Error Occured : " + e);
+            fileNameLabel.setText("Error Occured : " + e.getMessage());
         }
         initializeBoard(board.getRow(),board.getCol());
         displayPiecesOnBoard(board);
@@ -326,6 +327,101 @@ public class MainController {
             boardGrid.add(pieceContainer, pos.getCol(), pos.getRow());
         }
     }
+    private void clearPieceById(GridPane boardGrid, String pieceId) {
+        boardGrid.getChildren().removeIf(node ->
+            (node instanceof StackPane) && 
+            ((StackPane) node).getId() != null &&
+            ((StackPane) node).getId().equals(pieceId)
+        );
+    }
+
+    private void updatePieceByMovement(GridPane boardGrid, Movement movement) {
+        String pieceId = movement.getPieceId();
+        String direction = movement.getDirection();
+        int distance = movement.getDistance();
+
+        StackPane pieceContainer = null;
+        
+        for (javafx.scene.Node node : boardGrid.getChildren()) {
+            if (node instanceof StackPane && 
+                pieceId.equals(((StackPane) node).getId())) {
+                pieceContainer = (StackPane) node;
+                break;
+            }
+        }
+        
+        // Jika piece tidak ditemukan, keluar dari fungsi
+        if (pieceContainer == null) {
+            System.out.println("Piece with ID " + pieceId + " not found");
+            return;
+        }
+        
+        // Dapatkan posisi saat ini
+        Integer currentRow = GridPane.getRowIndex(pieceContainer);
+        Integer currentCol = GridPane.getColumnIndex(pieceContainer);
+        
+        // Jika posisi null, berikan nilai default 0
+        currentRow = (currentRow == null) ? 0 : currentRow;
+        currentCol = (currentCol == null) ? 0 : currentCol;
+        
+        // Hitung posisi baru berdasarkan direction dan distance
+        int newRow = currentRow;
+        int newCol = currentCol;
+        
+        switch (direction) {
+            case "U": 
+                newRow = currentRow - distance;
+                break;
+            case "D": 
+                newRow = currentRow + distance;
+                break;
+            case "L":
+                newCol = currentCol - distance;
+                break;
+            case "R": 
+                newCol = currentCol + distance;
+                break;
+            default:
+                System.out.println("Invalid direction: " + direction);
+                return;
+        }
+        
+        // Validasi posisi baru (pastikan dalam bounds GridPane)
+        int rowCount = boardGrid.getRowCount();
+        int colCount = boardGrid.getColumnCount();
+        
+        if (newRow < 0 || newRow >= rowCount || newCol < 0 || newCol >= colCount) {
+            System.out.println("Movement out of bounds: " + newRow + ", " + newCol);
+            return;
+        }
+        
+        // Periksa apakah ada piece lain di posisi target
+        boolean targetOccupied = false;
+        StackPane occupyingPiece = null;
+        
+        for (javafx.scene.Node node : boardGrid.getChildren()) {
+            if (node instanceof StackPane && node != pieceContainer) {
+                Integer nodeRow = GridPane.getRowIndex(node);
+                Integer nodeCol = GridPane.getColumnIndex(node);
+                
+                // Jika posisi null, berikan nilai default 0
+                nodeRow = (nodeRow == null) ? 0 : nodeRow;
+                nodeCol = (nodeCol == null) ? 0 : nodeCol;
+                
+                if (nodeRow == newRow && nodeCol == newCol) {
+                    targetOccupied = true;
+                    occupyingPiece = (StackPane) node;
+                    break;
+                }
+            }
+        }
+        
+  
+        
+        GridPane.setRowIndex(pieceContainer, newRow);
+        GridPane.setColumnIndex(pieceContainer, newCol);
+    }
+
 
     
 }
