@@ -1,8 +1,11 @@
 package com.jawa; 
 
 import java.io.File;
+import java.util.Map;
 
 import com.jawa.model.gameComponent.Board;
+import com.jawa.model.gameComponent.Piece;
+import com.jawa.model.gameComponent.Position;
 import com.jawa.model.gameState.IO;
 
 import javafx.fxml.FXML;
@@ -17,6 +20,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 
 public class MainController {
@@ -77,8 +82,7 @@ public class MainController {
                     
             updateHeuristicOptions(newValue);
         });
-        
-        // Listener untuk heuristik juga
+
         heuristicComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateSolveButtonState();
         });
@@ -102,7 +106,7 @@ public class MainController {
         }
     
         boardPane.getChildren().add(boardGrid);
-        
+       
         boardGrid.layoutXProperty().bind(
                 boardPane.widthProperty().subtract(boardGrid.widthProperty()).divide(2));
         boardGrid.layoutYProperty().bind(
@@ -204,7 +208,7 @@ public class MainController {
             fileNameLabel.setText("Error Occured : " + e);
         }
         initializeBoard(board.getRow(),board.getCol());
-            
+        displayPiecesOnBoard(board);
         fileUploaded = true;
         fileNameLabel.setText("File: " + selectedFile.getName()); 
         algorithmComboBox.setDisable(false);
@@ -265,5 +269,63 @@ public class MainController {
         if (cellSize < 20) cellSize = 20; 
         return cellSize;
     }
+
+    private void displayPiecesOnBoard(Board board) {
+        GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
+        clearPieces(boardGrid);
+        double cellSize = calculateCellSize(board.getRows(), board.getCols());
+        Map<String, Piece> pieces = board.getPieces();
+        for (Piece piece : pieces.values()) {
+            displaySinglePiece(boardGrid, piece, cellSize);
+        }
+    }
+    private void clearPieces(GridPane boardGrid) {
+        boardGrid.getChildren().removeIf(node -> 
+            !(node instanceof StackPane) || 
+            !((StackPane) node).getId().startsWith("cell_"));
+    }
+
+    private void displaySinglePiece(GridPane boardGrid, Piece piece, double cellSize) {
+        Rectangle pieceRect = new Rectangle();
+        
+        if (piece.isHorizontal()) {
+            pieceRect.setWidth(cellSize * piece.getLength() - 4); 
+            pieceRect.setHeight(cellSize - 4);
+        } else {
+            pieceRect.setWidth(cellSize - 4);
+            pieceRect.setHeight(cellSize * piece.getLength() - 4);
+        }
+        
+
+        pieceRect.setFill(piece.getColor());
+        pieceRect.setStroke(Color.BLACK);
+        pieceRect.setStrokeWidth(2);
+        pieceRect.setArcWidth(10);
+        pieceRect.setArcHeight(10);
+        
+        // // Efek hover
+        pieceRect.setOnMouseEntered(e -> pieceRect.setOpacity(0.8));
+        pieceRect.setOnMouseExited(e -> pieceRect.setOpacity(1.0));
+
+        StackPane pieceContainer = new StackPane();
+        pieceContainer.getChildren().add(pieceRect);
+ 
+        Label idLabel = new Label(piece.getId());
+        idLabel.setTextFill(Color.WHITE);
+        idLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+        pieceContainer.getChildren().add(idLabel);
+        
+        pieceContainer.setId(piece.getId());
+        
+        Position pos = piece.getPosition();
+        if (piece.isHorizontal()) {
+            GridPane.setColumnSpan(pieceContainer, piece.getLength());
+            boardGrid.add(pieceContainer, pos.getCol(), pos.getRow());
+        } else {
+            GridPane.setRowSpan(pieceContainer, piece.getLength());
+            boardGrid.add(pieceContainer, pos.getCol(), pos.getRow());
+        }
+    }
+
     
 }

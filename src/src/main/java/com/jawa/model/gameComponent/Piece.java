@@ -42,6 +42,9 @@ public class Piece {
         return id;
     }
 
+    public Color getColor(){
+        return color;
+    }
     public int getRow() {
         return position.getRow();
     }
@@ -60,6 +63,10 @@ public class Piece {
 
     public int getLength() {
         return length;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     public boolean isHorizontal() {

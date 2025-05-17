@@ -318,5 +318,11 @@ public class Board {
     public void setFinishPosition(Position exitPosition) {
         this.exitPosition = exitPosition;
     }
-    
+    public int getRows(){
+        return this.rows;
+    }
+    public int getCols(){
+        return this.cols;
+    }
 }
+
