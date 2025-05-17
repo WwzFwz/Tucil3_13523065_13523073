@@ -11,3 +11,4 @@ target/
 
 # Sistem
 .DS_Store
+bin
