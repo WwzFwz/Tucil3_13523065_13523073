@@ -18,14 +18,21 @@
    <left>
       <VBox styleClass="control-panel" BorderPane.alignment="CENTER">
          <children>
-            <Label styleClass="title-label" text="Rush Hour Solver">
-               <font>
-                  <Font name="System Bold" size="18.0" /> 
-               </font>
+            <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <children>
+                  <Label styleClass="title-label" text="Control Panel">
+                     <VBox.margin>
+                        <Insets bottom="15.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+                     
+            <Separator>
                <VBox.margin>
-                  <Insets bottom="15.0" />
+                  <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
-            </Label>
+            </Separator>
 <!--             
             <Label text="Upload Configuration" /> -->
             <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUploadFile" text="Select File">
@@ -33,7 +40,11 @@
                   <Insets bottom="10.0" top="5.0" />
                </VBox.margin>
             </Button>
-            <Label fx:id="fileNameLabel" text="No file selected" textFill="#757575" />
+            <HBox alignment="CENTER">
+               <children>
+                     <Label fx:id="fileNameLabel" text="No file selected" />
+               </children>
+            </HBox>
             
             <Separator>
                <VBox.margin>
@@ -41,21 +52,24 @@
                </VBox.margin>
             </Separator>
             
-            <Label text="Algorithm" />
-            <ComboBox fx:id="algorithmComboBox" maxWidth="1.7976931348623157E308" promptText="Select Algorithm">
+            <!-- <Label text="Algorithm" /> -->
+            <ComboBox fx:id="algorithmComboBox" maxWidth="1.7976931348623157E308" promptText="Select Algorithm" disable = "true">
                <VBox.margin>
                   <Insets bottom="10.0" top="5.0" />
                </VBox.margin>
             </ComboBox>
             
-            <Label text="Heuristic" />
-            <ComboBox fx:id="heuristicComboBox" maxWidth="1.7976931348623157E308" promptText="Select Heuristic">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="5.0" />
-               </VBox.margin>
-            </ComboBox>
+            <!-- <Label text="Heuristic" /> -->
+            <!-- <HBox fx:id="heuristicContainer" maxWidth="1.7976931348623157E308"> -->
+               <ComboBox fx:id="heuristicComboBox" maxWidth="1.7976931348623157E308" promptText="Select Heuristic" disable= "true">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="5.0" />
+                     </VBox.margin>
+               </ComboBox>
+            <!-- </HBox> -->
+
             
-            <Button fx:id="solveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSolve" styleClass="solve-button" text="Solve Puzzle">
+            <Button fx:id="solveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSolve" styleClass="solve-button" text="Solve Puzzle" disable = "true">
                <VBox.margin>
                   <Insets bottom="15.0" top="5.0" />
                </VBox.margin>
@@ -67,7 +81,11 @@
                </VBox.margin>
             </Separator>
             
-            <Label text="Playback Controls" />
+            <!-- <HBox alignment="CENTER">
+               <children>
+                  <Label text="Playback Controls" />
+               </children>
+            </HBox> -->
             <HBox alignment="CENTER" spacing="10.0">
                <children>
                   <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="⏮" />
@@ -78,8 +96,12 @@
                   <Insets bottom="10.0" top="5.0" />
                </VBox.margin>
             </HBox>
-            
-            <Label text="Solution Steps" />
+   
+            <HBox alignment="CENTER">
+               <children>        
+                  <Label text="Solution Steps" />
+               </children>
+            </HBox>
             <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
                <content>
                   <VBox>
@@ -89,17 +111,17 @@
                   </VBox>
                </content>
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets bottom="3.0" top="5.0" />
                </VBox.margin>
             </ScrollPane>
             
             <Pagination fx:id="stepsPagination" maxPageIndicatorCount="5" pageCount="5" />
             
-            <Label fx:id="statusLabel" text="Ready" textFill="#006400">
+            <!-- <Label fx:id="statusLabel" text="Ready" textFill="#006400">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
-            </Label>
+            </Label> -->
          </children>
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

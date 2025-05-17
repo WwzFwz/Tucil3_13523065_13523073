@@ -20,7 +20,7 @@ public class MainController {
     
     @FXML
     private ComboBox<String> heuristicComboBox;
-    
+
     @FXML
     private Button solveButton;
     
@@ -45,36 +45,175 @@ public class MainController {
     @FXML
     private Pane boardPane;
     
+    private boolean fileUploaded = false;
+
     @FXML
     private void initialize() {
-        // Initialize UI components
-        algorithmComboBox.getItems().addAll("BFS", "DFS", "A*", "Greedy Best-First");
-        heuristicComboBox.getItems().addAll("Blocking Cars", "Distance to Exit", "Manhattan Distance");
+
+        algorithmComboBox.getItems().addAll(
+            "A*", 
+            "Greedy Best-First", 
+            "Uniform-Cost Search"
+        );
+
+        algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            
+            // resetHeuristicAndSolveButton();
+            
+            updateHeuristicOptions(newValue);
+        });
+        
+        // Listener untuk heuristik juga
+        heuristicComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateSolveButtonState();
+        });
+
+
     }
     
+private void updateHeuristicOptions(String algorithm) {
+    heuristicComboBox.getItems().clear();
+    heuristicComboBox.setValue(null);
+    
+    solveButton.setDisable(true);
+    
+    if (!fileUploaded) {
+        heuristicComboBox.setDisable(true);
+        heuristicComboBox.setPromptText("Upload File First");
+        return;
+    }
+    
+    if (algorithm == null) {
+        heuristicComboBox.setDisable(true);
+        heuristicComboBox.setPromptText("Select Algorithm First");
+        return;
+    }
+    switch (algorithm) {
+        case "A*":
+            heuristicComboBox.setDisable(false);
+            heuristicComboBox.setPromptText("Select Heuristic");
+            heuristicComboBox.getItems().addAll(
+                "Manhattan Distance", 
+                "Blocking Vehicles", 
+                "Advanced Blocking"
+            );
+            break;
+                
+        case "Greedy Best-First":
+            heuristicComboBox.setDisable(false);
+            heuristicComboBox.getItems().addAll(
+                "Manhattan Distance", 
+                "Blocking Vehicles"
+            );
+            break;
+                
+        case "Uniform-Cost Search":
+            heuristicComboBox.setDisable(true);
+            heuristicComboBox.setPromptText("No Heuristic Needed");
+            if (fileUploaded) {
+                solveButton.setDisable(false);
+            }
+            break;
+                
+        default:
+            heuristicComboBox.setDisable(true);
+            heuristicComboBox.setPromptText("Unknown Algorithm");
+    }
+}
+
+    private void updateSolveButtonState() {
+
+        if (!fileUploaded) {   
+            solveButton.setDisable(true);
+            return;
+        }
+        
+       
+        String algorithm = algorithmComboBox.getValue();
+        if (algorithm == null) {
+            solveButton.setDisable(true);
+            return;
+        }
+
+        switch (algorithm) {
+            case "A*":
+            case "Greedy Best-First":
+                solveButton.setDisable(heuristicComboBox.getValue() == null);
+                break;
+                
+            case "Uniform-Cost Search":
+                solveButton.setDisable(false);
+                break;
+                
+            default:
+                solveButton.setDisable(true);
+                break;
+        }
+    }
     @FXML
     private void handleUploadFile() {
-        fileNameLabel.setText("File selected: example.txt");
+        fileUploaded = true;
+        fileNameLabel.setText("File: " + "test.txt"); 
+        algorithmComboBox.setDisable(false);
+        algorithmComboBox.setPromptText("Select Algorithm");
+        updateHeuristicOptions(algorithmComboBox.getValue());
     }
-    
+
     @FXML   
     private void handleSolve() {
-        // Handle solve button click
-        statusLabel.setText("Solving...");
+        String selectedAlgorithm = algorithmComboBox.getValue();
+        String selectedHeuristic = heuristicComboBox.getValue();
+
     }
     
     @FXML
     private void handlePlayPause() {
-        // Handle play/pause button
     }
     
     @FXML
-    private void handleNext() {
-        // Handle next button
+    private void handleNext() { 
+ 
     }
     
     @FXML
     private void handleBack() {
-        // Handle back button
+     
     }
+    // public void handleReset() {
+    //     // hapus aja klo nanti ga ada tombol reset
+    //     fileUploaded = false;
+    //     // currentFile = null;
+    //     fileNameLabel.setText("No file selected");
+        
+    //     algorithmComboBox.setValue(null);
+    //     heuristicComboBox.setValue(null);
+        
+    //     algorithmComboBox.setDisable(true);
+    //     heuristicComboBox.setDisable(true);
+    //     solveButton.setDisable(true);
+    //     backButton.setDisable(true);
+    //     playPauseButton.setDisable(true);
+    //     nextButton.setDisable(true);
+        
+
+    //     algorithmComboBox.setPromptText("Upload File First");
+    //     heuristicComboBox.setPromptText("Select Algorithm First");
+        
+ 
+    //     stepsListView.getItems().clear();
+        
+
+    //     // markStepAsPending(uploadButton);
+    //     // markStepAsPending(algorithmComboBox);
+    //     // markStepAsPending(heuristicComboBox);
+    //     // markStepAsPending(solveButton);
+        
+    //     stepsPagination.setDisable(true);
+    //     stepsPagination.setPageCount(1);
+    //     stepsPagination.setCurrentPageIndex(0);
+        
+    //     System.out.println("dirsset");
+    // }
+
+
 }
