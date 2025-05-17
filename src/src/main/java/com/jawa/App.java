@@ -18,7 +18,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         stage.setTitle("Rush Hour Solver");
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        scene = new Scene(loadFXML("primary"), 1080, 720);
         scene.getStylesheets().clear();
         scene.getStylesheets().add(App.class.getResource("styles.css").toExternalForm());
         stage.setScene(scene);

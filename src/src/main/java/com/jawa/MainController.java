@@ -63,9 +63,7 @@ public class MainController {
         );
 
         algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-        
-            // resetHeuristicAndSolveButton();
-            
+                    
             updateHeuristicOptions(newValue);
         });
         
@@ -243,4 +241,5 @@ public class MainController {
         if (cellSize < 20) cellSize = 20; 
         return cellSize;
     }
+    
 }
