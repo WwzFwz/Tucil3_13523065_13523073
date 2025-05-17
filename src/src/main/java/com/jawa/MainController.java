@@ -187,12 +187,14 @@ public class MainController {
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
+        initializeBoard(10, 10); // ukuran konfigurasi
     }
 
     @FXML   
     private void handleSolve() {
         String selectedAlgorithm = algorithmComboBox.getValue();
         String selectedHeuristic = heuristicComboBox.getValue();
+
 
     }
     
@@ -209,41 +211,6 @@ public class MainController {
     private void handleBack() {
      
     }
-    // public void handleReset() {
-    //     // hapus aja klo nanti ga ada tombol reset
-    //     fileUploaded = false;
-    //     // currentFile = null;
-    //     fileNameLabel.setText("No file selected");
-        
-    //     algorithmComboBox.setValue(null);
-    //     heuristicComboBox.setValue(null);
-        
-    //     algorithmComboBox.setDisable(true);
-    //     heuristicComboBox.setDisable(true);
-    //     solveButton.setDisable(true);
-    //     backButton.setDisable(true);
-    //     playPauseButton.setDisable(true);
-    //     nextButton.setDisable(true);
-        
-
-    //     algorithmComboBox.setPromptText("Upload File First");
-    //     heuristicComboBox.setPromptText("Select Algorithm First");
-        
- 
-    //     stepsListView.getItems().clear();
-        
-
-    //     // markStepAsPending(uploadButton);
-    //     // markStepAsPending(algorithmComboBox);
-    //     // markStepAsPending(heuristicComboBox);
-    //     // markStepAsPending(solveButton);
-        
-    //     stepsPagination.setDisable(true);
-    //     stepsPagination.setPageCount(1);
-    //     stepsPagination.setCurrentPageIndex(0);
-        
-    //     System.out.println("dirsset");
-    // }
     private StackPane createCell(int row, int col, double size) {
         Rectangle cellBg = new Rectangle(size, size);
         cellBg.setFill(Color.web("#1a1158")); 
