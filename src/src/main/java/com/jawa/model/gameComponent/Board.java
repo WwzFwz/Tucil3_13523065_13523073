@@ -133,17 +133,41 @@ public class Board {
         int tailRow = pr;
         int tailCol = pc;
 
+        System.out.println("col : " + exitCol + " row : " + exitRow);
+        System.out.println("pc : " + pc + " pr: " + pr);
+
         if (primary.isHorizontal()) {
             tailCol = pc + primary.getLength() - 1;
-            // primary berada pada baris yang sama dengan exit dan ujungnya menyentuh sisi
-            // kiri/kanan exit
-            return pr == exitRow && (tailCol + 1 == exitCol);
+
+            // Jika exit di kanan
+            if (pr == exitRow && tailCol + 1 == exitCol) {
+                System.err.println("1");
+                return true;
+            }
+
+            // Jika exit di kiri
+            if (pr == exitRow && exitCol > pc) {
+                System.err.println("2");
+                return true;
+            }
+
         } else {
             tailRow = pr + primary.getLength() - 1;
-            // primary berada pada kolom yang sama dengan exit dan ujungnya menyentuh sisi
-            // atas/bawah exit
-            return pc == exitCol && (tailRow + 1 == exitRow);
+
+            // Jika exit di bawah
+            if (pc == exitCol && tailRow + 1 == exitRow) {
+                System.err.println("3");
+                return true;
+            }
+
+            // Jika exit di atas
+            if (pc == exitCol && exitRow == pr) {
+                System.err.println("4");
+                return true;
+            }
         }
+
+        return false;
     }
 
     public boolean isCellEmpty(int r, int c) {
