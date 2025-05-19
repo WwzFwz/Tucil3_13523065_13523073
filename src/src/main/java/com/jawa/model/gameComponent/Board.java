@@ -14,7 +14,7 @@ public class Board {
     private Map<String, Piece> pieces; // key = piece_id
     private Position exitPosition;
 
-    private static final String[] ANSI_COLORS = {
+    private static final String[] ANSI_COLORS = { // buat cli
             "\u001B[31m", // A → merah
             "\u001B[32m", // B → hijau
             "\u001B[33m", // C → kuning
@@ -304,10 +304,10 @@ public class Board {
 
     public Board deepCopy() {
         Board copy = new Board(this.rows, this.cols , this.countPiece);
-        copy.setExitPosition(new Position(this.exitPosition)); // pastikan Position juga punya copy constructor
+        copy.setExitPosition(new Position(this.exitPosition)); 
 
         for (Piece p : this.pieces.values()) {
-            copy.addPiece(new Piece(p)); // gunakan copy constructor di Piece
+            copy.addPiece(new Piece(p)); 
         }
         return copy;
     }
@@ -323,6 +323,27 @@ public class Board {
     }
     public int getCols(){
         return this.cols;
+    }
+    public void reverseMovement(Movement movement) {
+        Piece piece = pieces.get(movement.getPieceId());
+        if (piece == null) return;
+        
+   
+        String oppositeDirection = getOppositeDirection(movement.getDirection());
+        int distance = movement.getDistance();
+        
+        piece.move(oppositeDirection, distance);
+    }
+
+
+    public String getOppositeDirection(String direction) {
+        switch(direction) {
+            case "R": return "L";
+            case "L": return "R";
+            case "U": return "D";
+            case "D": return "U";
+            default: return direction;
+        }
     }
 }
 

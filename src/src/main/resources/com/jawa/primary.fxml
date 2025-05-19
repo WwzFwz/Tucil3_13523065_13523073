@@ -88,9 +88,9 @@
             </HBox> -->
             <HBox alignment="CENTER" spacing="10.0">
                <children>
-                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="⏮" />
-                  <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#handlePlayPause" text="▶" />
-                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="⏭" />
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="⏮" disable="true" />
+                  <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#handlePlayPause" text="▶" disable ="true" />
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="⏭" disable= "true" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" top="5.0" />
@@ -117,11 +117,11 @@
             
             <Pagination fx:id="stepsPagination" maxPageIndicatorCount="5" pageCount="5" />
             
-            <!-- <Label fx:id="statusLabel" text="Ready" textFill="#006400">
+            <Label fx:id="statusLabel" text="Ready" textFill="#006400">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
-            </Label> -->
+            </Label>
          </children>
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

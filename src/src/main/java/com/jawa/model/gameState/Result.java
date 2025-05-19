@@ -1,6 +1,7 @@
 package com.jawa.model.gameState;
 
 import java.util.List;
+
 import com.jawa.model.gameComponent.Movement;
 
 public class Result {
@@ -42,5 +43,8 @@ public class Result {
 
     public void setNodesExpanded(int nodesExpanded) {
         this.nodesExpanded = nodesExpanded;
+    }
+    public List<Movement> getMovements(){
+        return moves;
     }
 }

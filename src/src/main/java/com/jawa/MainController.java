@@ -1,16 +1,25 @@
 package com.jawa; 
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
+import com.jawa.model.algorithm.GreatSolver;
+import com.jawa.model.algorithm.Heuristic;
+import com.jawa.model.algorithm.Solver;
+import com.jawa.model.algorithm.ZeroHeuristic;
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 import com.jawa.model.gameState.IO;
+import com.jawa.model.gameState.Result;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -24,6 +33,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 public class MainController {
     @FXML
@@ -65,12 +75,17 @@ public class MainController {
     private boolean fileUploaded = false;
     private File selectedFile;
     private Board board;
-    public File getSelectedFile(){
-        return selectedFile;
-    }
+    private Board originalBoard;
+    private Result result;
+    private final int stepsPerPage = 12;   
+    private Timeline playbackTimeline;   
+    private boolean isPlaying = false;  
+    private int currentStepIndex = -1;  
+
+
     @FXML
     private void initialize() {
-        initializeBoard(30, 30);
+        initializeBoard(6, 6);
 
 
         algorithmComboBox.getItems().addAll(
@@ -78,14 +93,30 @@ public class MainController {
             "Greedy Best-First", 
             "Uniform-Cost Search"
         );
-
-        algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-                    
+    
+        algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {           
             updateHeuristicOptions(newValue);
         });
 
         heuristicComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateSolveButtonState();
+        });
+
+        stepsPagination.setPageCount(1);
+        stepsPagination.setCurrentPageIndex(0);
+        stepsPagination.setMaxPageIndicatorCount(5);
+        
+        stepsPagination.currentPageIndexProperty().addListener((obs, oldVal, newVal) -> {
+            updateStepsListView(newVal.intValue());
+        });
+        
+        stepsListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.intValue() >= 0 && result != null && result.getMovements() != null) {
+                int stepIndex = stepsPagination.getCurrentPageIndex() * stepsPerPage + newVal.intValue();
+                if (stepIndex < result.getMovements().size()) {
+                    showSolutionStep(stepIndex);
+                }
+            }
         });
 
 
@@ -131,6 +162,9 @@ public class MainController {
             heuristicComboBox.setPromptText("Select Algorithm First");
             return;
         }
+        else {
+            solveButton.setDisable(false);
+        }
         switch (algorithm) {
             case "A*":
                 heuristicComboBox.setDisable(false);
@@ -175,24 +209,33 @@ public class MainController {
         String algorithm = algorithmComboBox.getValue();
         if (algorithm == null) {
             solveButton.setDisable(true);
-            return;
         }
-
-        switch (algorithm) {
-            case "A*":
-            case "Greedy Best-First":
-                solveButton.setDisable(heuristicComboBox.getValue() == null);
-                break;
-                
-            case "Uniform-Cost Search":
-                solveButton.setDisable(false);
-                break;
-                
-            default:
-                solveButton.setDisable(true);
-                break;
+        else{
+            solveButton.setDisable(false);
         }
     }
+    private void updateStepsListView(int pageIndex) {
+        System.err.println("Updating ListView for page " + pageIndex);
+        stepsListView.getItems().clear();
+        
+        if (result == null || result.getMovements().isEmpty()) {
+            return;
+        }
+        
+        int startIndex = pageIndex * stepsPerPage;
+        int endIndex = Math.min(startIndex + stepsPerPage, result.getMovements().size());
+        
+        for (int i = startIndex; i < endIndex; i++) {
+            Movement step = result.getMovements().get(i);
+            stepsListView.getItems().add("Step " + (i+1) + ": " + step.toString());
+            System.err.println(step);
+        }
+        
+        if (currentStepIndex >= startIndex && currentStepIndex < endIndex) {
+            stepsListView.getSelectionModel().select(currentStepIndex - startIndex);
+        }
+    }
+
     @FXML
     private void handleUploadFile() {
         FileChooser fileChooser = new FileChooser();
@@ -204,40 +247,207 @@ public class MainController {
    
         selectedFile = fileChooser.showOpenDialog(uploadButton.getScene().getWindow());
         try {
-            board = IO.loadFromFile(getSelectedFile());
+            board = IO.loadFromFile(selectedFile);
         } catch (Exception e) {
             fileNameLabel.setText("Error Occured : " + e.getMessage());
         }
         initializeBoard(board.getRow(),board.getCol());
-        displayPiecesOnBoard(board);
+        originalBoard = board.deepCopy();
+        displayBoard(board);
         fileUploaded = true;
         fileNameLabel.setText("File: " + selectedFile.getName()); 
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
     }
-
-    @FXML   
+    // @FXML
+    // private void handleSolve() {         
+    //     if(result != null) result = null;        
+    //         String algorithm = algorithmComboBox.getValue();    
+    //         String heuristicInput = heuristicComboBox.getValue();      
+    //         currentStepIndex= 0;                 
+    //         Heuristic ZeroHeuristic = new ZeroHeuristic();   
+    //         Solver solver = new GreatSolver(ZeroHeuristic);       
+    //         result = solver.solve(board);       
+    //         playPauseButton.setDisable(false);      
+    //         updateStepsListView(0);
+                                
+    // }
+    @FXML
     private void handleSolve() {
-        String selectedAlgorithm = algorithmComboBox.getValue();
-        String selectedHeuristic = heuristicComboBox.getValue();
+      
+        if (result != null) result = null;
 
+        String algorithm = algorithmComboBox.getValue();
+        String heuristicChoice = heuristicComboBox.getValue();
+        currentStepIndex = -1; 
+        board = originalBoard.deepCopy(); 
+        
+        Heuristic selectedHeuristic;
+     
+        if (heuristicChoice != null) {
+            switch (heuristicChoice) {
+                case "Manhattan Distance":
+                    selectedHeuristic = new ZeroHeuristic();
+                    break;
+                case "Blocking Vehicles":
+                    selectedHeuristic = new ZeroHeuristic();
+                    break;
+                case "Advanced Blocking":
+                    selectedHeuristic = new ZeroHeuristic();
+                    break;
+                default:
+              
+                    selectedHeuristic = new ZeroHeuristic();
+            }
+        } else {
+    
+            selectedHeuristic = new ZeroHeuristic();
+        }
+        
 
+        Solver solver;
+        if (algorithm == null) {
+            solver = new GreatSolver(selectedHeuristic);
+        } else {
+            switch (algorithm) {
+                case "A*":
+                    solver = new GreatSolver(selectedHeuristic);  
+                    break;
+                case "Greedy Best-First":
+                    solver = new GreatSolver(selectedHeuristic);
+                    break;
+                case "Uniform-Cost Search":
+                    solver = new GreatSolver(selectedHeuristic);
+                    break;
+                default:
+                    solver = new GreatSolver(selectedHeuristic);
+            }
+        }
+        
+   
+        try {
+        
+            statusLabel.setText("Solving puzzle...");
+            result = solver.solve(board);
+            if (result == null || result.getMovements() == null || result.getMovements().isEmpty()) {
+                statusLabel.setText("No solution found.");
+                return;
+            }
+            int totalPages = (int) Math.ceil((double) result.getMovements().size() / stepsPerPage);
+            stepsPagination.setPageCount(Math.max(1, totalPages));
+            stepsPagination.setCurrentPageIndex(0);
+
+            nextButton.setDisable(result.getMovements().size() <= 1);
+            playPauseButton.setDisable(false);
+            
+            updateStepsListView(0);
+            statusLabel.setText("Solution found: " + result.getMovements().size() + 
+                                " steps in " + result.getSolvingTime() + "ms");
+        } catch (Exception e) {
+            // e.printStackTrace();
+            statusLabel.setText("Error: " + e.getMessage());
+        }
     }
-    
-    @FXML
-    private void handlePlayPause() {
-    }
-    
-    @FXML
-    private void handleNext() { 
- 
-    }
-    
     @FXML
     private void handleBack() {
-     
+        if (currentStepIndex > 0) {
+            showSolutionStep(currentStepIndex - 1);
+        }
     }
+
+    @FXML
+    private void handleNext() {
+        List<Movement> solutionSteps = result.getMovements();
+        if (solutionSteps != null && currentStepIndex < solutionSteps.size() - 1) {
+            showSolutionStep(currentStepIndex + 1);
+        }
+    }
+
+
+    @FXML
+    private void handlePlayPause() {
+        List<Movement> solutionSteps = result.getMovements();
+        if (solutionSteps == null || solutionSteps.isEmpty()) {
+            return;
+        }
+        
+        if (isPlaying) {
+           
+            playPauseButton.setText("▶");
+            if (playbackTimeline != null) {
+                playbackTimeline.stop();
+            }
+            isPlaying = false;
+        } else {
+            isPlaying = true;
+            playPauseButton.setText("⏸");
+            startPlayback();
+           
+        }
+    }
+    private void startPlayback() {
+        if (playbackTimeline != null) {
+            playbackTimeline.stop();
+        }
+        
+        playbackTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> {
+                if (currentStepIndex < result.getMovements().size() - 1) {
+               
+                showSolutionStep(currentStepIndex + 1);
+                   
+                } else {
+                    playPauseButton.setText("▶");
+                    isPlaying = false;
+                    playbackTimeline.stop();
+                }
+            })
+        );
+        
+        playbackTimeline.setCycleCount(Timeline.INDEFINITE);
+        playbackTimeline.play();
+    }
+        // private void startPlayback() {
+        //     List<Movement> solutionSteps = result.getMovements();
+        //     if (playbackTimeline != null) {
+        //         playbackTimeline.stop();
+        //     }
+            
+        //     // Create a single-step timeline instead of a continuous one
+        //     playbackTimeline = new Timeline();
+            
+        //     // Add a key frame to move to the next step
+        //     KeyFrame keyFrame = new KeyFrame(javafx.util.Duration.seconds(1), e -> {
+        //         if (currentStepIndex < solutionSteps.size() - 1) {
+        //             int nextStep = currentStepIndex + 1;
+        //             System.out.println("Timeline advancing to step: " + nextStep);
+        //             showSolutionStep(nextStep);
+                    
+        //             // If we're not at the end and still playing, schedule the next step
+        //             if (nextStep < solutionSteps.size() - 1 && isPlaying) {
+        //                 // Schedule next step by creating a new timeline
+        //                 Platform.runLater(this::startPlayback);
+        //             } else if (nextStep >= solutionSteps.size() - 1) {
+        //                 // At the end, reset play button
+        //                 playPauseButton.setText("▶");
+        //                 isPlaying = false;
+        //             }
+        //         } else {
+        //             playPauseButton.setText("▶");
+        //             isPlaying = false;
+        //         }
+        //     });
+            
+        //     // Add the key frame to timeline
+        //     playbackTimeline.getKeyFrames().add(keyFrame);
+            
+        //     // Play once (not indefinitely)
+        //     playbackTimeline.setCycleCount(1);
+        //     playbackTimeline.play();
+        // }
+
+
     private StackPane createCell(int row, int col, double size) {
         Rectangle cellBg = new Rectangle(size, size);
         cellBg.setFill(Color.web("#1a1158")); 
@@ -271,7 +481,7 @@ public class MainController {
         return cellSize;
     }
 
-    private void displayPiecesOnBoard(Board board) {
+    private void displayBoard(Board board) {
         GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
         clearPieces(boardGrid);
         double cellSize = calculateCellSize(board.getRows(), board.getCols());
@@ -303,8 +513,7 @@ public class MainController {
         pieceRect.setStrokeWidth(2);
         pieceRect.setArcWidth(10);
         pieceRect.setArcHeight(10);
-        
-        // // Efek hover
+ 
         pieceRect.setOnMouseEntered(e -> pieceRect.setOpacity(0.8));
         pieceRect.setOnMouseExited(e -> pieceRect.setOpacity(1.0));
 
@@ -327,101 +536,105 @@ public class MainController {
             boardGrid.add(pieceContainer, pos.getCol(), pos.getRow());
         }
     }
-    private void clearPieceById(GridPane boardGrid, String pieceId) {
-        boardGrid.getChildren().removeIf(node ->
-            (node instanceof StackPane) && 
-            ((StackPane) node).getId() != null &&
-            ((StackPane) node).getId().equals(pieceId)
-        );
-    }
 
-    private void updatePieceByMovement(GridPane boardGrid, Movement movement) {
-        String pieceId = movement.getPieceId();
-        String direction = movement.getDirection();
-        int distance = movement.getDistance();
-
-        StackPane pieceContainer = null;
+    private void updateSinglePiece(String pieceId) {
+        GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
+        Piece piece = board.getPieces().get(pieceId);
         
-        for (javafx.scene.Node node : boardGrid.getChildren()) {
+        if (piece == null) return;
+    
+        StackPane pieceNode = null;
+        for (Node node : boardGrid.getChildren()) {
             if (node instanceof StackPane && 
-                pieceId.equals(((StackPane) node).getId())) {
-                pieceContainer = (StackPane) node;
+                node.getId() != null && 
+                node.getId().equals(pieceId)) {
+                pieceNode = (StackPane) node;
                 break;
             }
         }
         
-        // Jika piece tidak ditemukan, keluar dari fungsi
-        if (pieceContainer == null) {
-            System.out.println("Piece with ID " + pieceId + " not found");
+
+        if (pieceNode != null) {
+            boardGrid.getChildren().remove(pieceNode);
+            
+            Position pos = piece.getPosition();
+            if (piece.isHorizontal()) {
+                GridPane.setColumnSpan(pieceNode, piece.getLength());
+                boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
+            } else {
+                GridPane.setRowSpan(pieceNode, piece.getLength());
+                boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
+            }
+        } 
+        else {
+            double cellSize = calculateCellSize(board.getRows(), board.getCols());
+            displaySinglePiece(boardGrid, piece, cellSize);
+        }
+    }
+
+    private void showSolutionStep(int stepIndex) {
+        System.err.println("dipanngil");
+        List<Movement> solutionSteps = result.getMovements();
+        if (solutionSteps == null || stepIndex < 0 || stepIndex >= solutionSteps.size()) {
             return;
         }
-        
-        // Dapatkan posisi saat ini
-        Integer currentRow = GridPane.getRowIndex(pieceContainer);
-        Integer currentCol = GridPane.getColumnIndex(pieceContainer);
-        
-        // Jika posisi null, berikan nilai default 0
-        currentRow = (currentRow == null) ? 0 : currentRow;
-        currentCol = (currentCol == null) ? 0 : currentCol;
-        
-        // Hitung posisi baru berdasarkan direction dan distance
-        int newRow = currentRow;
-        int newCol = currentCol;
-        
-        switch (direction) {
-            case "U": 
-                newRow = currentRow - distance;
-                break;
-            case "D": 
-                newRow = currentRow + distance;
-                break;
-            case "L":
-                newCol = currentCol - distance;
-                break;
-            case "R": 
-                newCol = currentCol + distance;
-                break;
-            default:
-                System.out.println("Invalid direction: " + direction);
-                return;
-        }
-        
-        // Validasi posisi baru (pastikan dalam bounds GridPane)
-        int rowCount = boardGrid.getRowCount();
-        int colCount = boardGrid.getColumnCount();
-        
-        if (newRow < 0 || newRow >= rowCount || newCol < 0 || newCol >= colCount) {
-            System.out.println("Movement out of bounds: " + newRow + ", " + newCol);
-            return;
-        }
-        
-        // Periksa apakah ada piece lain di posisi target
-        boolean targetOccupied = false;
-        StackPane occupyingPiece = null;
-        
-        for (javafx.scene.Node node : boardGrid.getChildren()) {
-            if (node instanceof StackPane && node != pieceContainer) {
-                Integer nodeRow = GridPane.getRowIndex(node);
-                Integer nodeCol = GridPane.getColumnIndex(node);
-                
-                // Jika posisi null, berikan nilai default 0
-                nodeRow = (nodeRow == null) ? 0 : nodeRow;
-                nodeCol = (nodeCol == null) ? 0 : nodeCol;
-                
-                if (nodeRow == newRow && nodeCol == newCol) {
-                    targetOccupied = true;
-                    occupyingPiece = (StackPane) node;
-                    break;
+       
+        if (currentStepIndex == -1 || Math.abs(stepIndex - currentStepIndex) > 1) {
+            board = originalBoard.deepCopy();
+            
+            for (int i = 0; i <= stepIndex; i++) {
+                Movement move = solutionSteps.get(i);
+                Piece piece = board.getPieces().get(move.getPieceId());
+                if (piece != null) {
+                    piece.move(move.getDirection(), move.getDistance());
                 }
             }
+            displayBoard(board);
+        } 
+
+        else {
+         
+            Movement movement;
+            if (stepIndex > currentStepIndex) {
+                movement = solutionSteps.get(stepIndex);
+                Piece piece = board.getPieces().get(movement.getPieceId());
+                if (piece != null) {
+                    piece.move(movement.getDirection(), movement.getDistance());
+                }
+            } else {
+                movement = solutionSteps.get(currentStepIndex);
+                Piece piece = board.getPieces().get(movement.getPieceId());
+                if (piece != null) {
+                    piece.move(board.getOppositeDirection(movement.getDirection()), movement.getDistance());
+                }
+            }
+            
+            updateSinglePiece(movement.getPieceId());
         }
         
-  
+         try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) { }
+
+        currentStepIndex = stepIndex;
         
-        GridPane.setRowIndex(pieceContainer, newRow);
-        GridPane.setColumnIndex(pieceContainer, newCol);
+
+        int pageIndex = stepIndex / stepsPerPage;
+        if (pageIndex != stepsPagination.getCurrentPageIndex()) {
+            stepsPagination.setCurrentPageIndex(pageIndex);
+        } else {
+            int listIndex = stepIndex % stepsPerPage;
+            stepsListView.getSelectionModel().select(listIndex);
+        }
+      
+        backButton.setDisable(stepIndex == 0);
+        nextButton.setDisable(stepIndex == solutionSteps.size() - 1);
+        
+        statusLabel.setText("Step " + (stepIndex + 1) + " of " + solutionSteps.size());
     }
-
-
-    
+    // private void dummySolve() {
+        
+  
+    //     result.getMovements().add(new Movement("A", "R", 1));     
+    // }
 }
