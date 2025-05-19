@@ -39,7 +39,7 @@ public class Board {
         return ANSI_COLORS[idx] + ch + "\u001B[0m";
     }
 
-    public Board(int rows, int cols ,int countPiece) {
+    public Board(int rows, int cols, int countPiece) {
         this.rows = rows;
         this.cols = cols;
         this.countPiece = countPiece;
@@ -126,6 +126,8 @@ public class Board {
         if (primary == null || exitPosition == null)
             return false;
 
+        int exitRow = exitPosition.getRow();
+        int exitCol = exitPosition.getCol();
         int pr = primary.getRow();
         int pc = primary.getCol();
         int tailRow = pr;
@@ -133,26 +135,14 @@ public class Board {
 
         if (primary.isHorizontal()) {
             tailCol = pc + primary.getLength() - 1;
+            // primary berada pada baris yang sama dengan exit dan ujungnya menyentuh sisi
+            // kiri/kanan exit
+            return pr == exitRow && (tailCol + 1 == exitCol);
         } else {
             tailRow = pr + primary.getLength() - 1;
-        }
-
-        if (primary.isHorizontal()) {
-            if (pr != exitPosition.getRow())
-                return false;
-            for (int c = tailCol + 1; c < exitPosition.getCol(); c++) {
-                if (!isCellEmpty(pr, c))
-                    return false;
-            }
-            return true;
-        } else {
-            if (pc != exitPosition.getCol())
-                return false;
-            for (int r = tailRow + 1; r < exitPosition.getRow(); r++) {
-                if (!isCellEmpty(r, pc))
-                    return false;
-            }
-            return true;
+            // primary berada pada kolom yang sama dengan exit dan ujungnya menyentuh sisi
+            // atas/bawah exit
+            return pc == exitCol && (tailRow + 1 == exitRow);
         }
     }
 
@@ -303,47 +293,79 @@ public class Board {
     }
 
     public Board deepCopy() {
-        Board copy = new Board(this.rows, this.cols , this.countPiece);
-        copy.setExitPosition(new Position(this.exitPosition)); 
+        Board copy = new Board(this.rows, this.cols, this.countPiece);
+        copy.setExitPosition(new Position(this.exitPosition));
 
         for (Piece p : this.pieces.values()) {
-            copy.addPiece(new Piece(p)); 
+            copy.addPiece(new Piece(p));
         }
         return copy;
     }
+
     public Position getFinishPosition() {
         return exitPosition;
     }
-    
+
     public void setFinishPosition(Position exitPosition) {
         this.exitPosition = exitPosition;
     }
-    public int getRows(){
+
+    public int getRows() {
         return this.rows;
     }
-    public int getCols(){
+
+    public int getCols() {
         return this.cols;
     }
+
     public void reverseMovement(Movement movement) {
         Piece piece = pieces.get(movement.getPieceId());
-        if (piece == null) return;
-        
-   
+        if (piece == null)
+            return;
+
         String oppositeDirection = getOppositeDirection(movement.getDirection());
         int distance = movement.getDistance();
-        
+
         piece.move(oppositeDirection, distance);
     }
 
-
     public String getOppositeDirection(String direction) {
-        switch(direction) {
-            case "R": return "L";
-            case "L": return "R";
-            case "U": return "D";
-            case "D": return "U";
-            default: return direction;
+        switch (direction) {
+            case "R":
+                return "L";
+            case "L":
+                return "R";
+            case "U":
+                return "D";
+            case "D":
+                return "U";
+            default:
+                return direction;
         }
     }
-}
 
+    public Piece getPrimaryPiece() {
+        return pieces.get("P");
+    }
+
+    public char[][] getBoardState() {
+        char[][] grid = new char[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            Arrays.fill(grid[r], '.');
+        }
+
+        for (Piece p : pieces.values()) {
+            int pr = p.getRow();
+            int pc = p.getCol();
+            for (int i = 0; i < p.getLength(); i++) {
+                int r = pr + (!p.isHorizontal() ? i : 0);
+                int c = pc + (p.isHorizontal() ? i : 0);
+                if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                    grid[r][c] = p.getId().charAt(0);
+                }
+            }
+        }
+        return grid;
+    }
+
+}
