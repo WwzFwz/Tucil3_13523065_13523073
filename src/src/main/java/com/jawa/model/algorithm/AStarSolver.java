@@ -94,13 +94,20 @@ public class AStarSolver implements Solver {
 
         for (var piece : board.getPieces().values()) {
             for (String dir : piece.isHorizontal() ? new String[] { "L", "R" } : new String[] { "U", "D" }) {
-                Board newBoard = board.deepCopy();
-                Piece movedPiece = newBoard.getPieces().get(piece.getId());
-                if (canMove(newBoard, movedPiece, dir, 1)) {
-                    Movement move = movedPiece.move(dir, 1);
-                    children.add(new ChildNode(newBoard, move));
+                for (int distance = 1; distance < Math.max(board.getRow(), board.getCol()); distance++) {
+                    Board newBoard = board.deepCopy();
+                    Piece movedPiece = newBoard.getPieces().get(piece.getId());
+
+                    if (canMove(newBoard, movedPiece, dir, distance)) {
+                        Movement move = movedPiece.move(dir, distance);
+                        children.add(new ChildNode(newBoard, move));
+                    } else {
+                        // begitu ketemu satu langkah yang tidak valid, tidak perlu coba lebih jauh
+                        break;
+                    }
                 }
             }
+
         }
 
         return children;
