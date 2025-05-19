@@ -137,25 +137,25 @@ public class Board {
         System.out.println("pc : " + pc + " pr: " + pr);
 
         if (primary.isHorizontal()) {
-            tailCol = pc + primary.getLength() - 1;
+            tailCol = pc + primary.getLength();
 
             // Jika exit di kanan
-            if (pr == exitRow && tailCol + 1 == exitCol) {
+            if (pr == exitRow && tailCol == exitCol) {
                 System.err.println("1");
                 return true;
             }
 
             // Jika exit di kiri
-            if (pr == exitRow && exitCol > pc) {
+            if (pr == exitRow && exitCol == pc + 1) {
                 System.err.println("2");
                 return true;
             }
 
         } else {
-            tailRow = pr + primary.getLength() - 1;
+            tailRow = pr + primary.getLength();
 
             // Jika exit di bawah
-            if (pc == exitCol && tailRow + 1 == exitRow) {
+            if (pc == exitCol && tailRow == exitRow) {
                 System.err.println("3");
                 return true;
             }
