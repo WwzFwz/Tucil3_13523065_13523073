@@ -12,8 +12,13 @@ import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameState.Result;
 
-public class GreatSolver implements  Solver {
+public class GreatSolver implements Solver {
+    public enum SearchStrategy {
+        ASTAR, UCS, GREEDY
+    }
+
     private Heuristic heuristic;
+    private SearchStrategy strategy;
 
     public GreatSolver(Heuristic heuristic) {
         this.heuristic = heuristic;
@@ -33,6 +38,7 @@ public class GreatSolver implements  Solver {
             this.f = f;
         }
     }
+
     @Override
     public Result solve(Board initial) {
         long startTime = System.currentTimeMillis();
