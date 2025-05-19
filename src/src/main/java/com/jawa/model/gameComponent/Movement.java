@@ -34,4 +34,18 @@ public class Movement {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+    @Override
+    public String toString() {
+        String directionText = "";
+        switch (direction) {
+            case "R": directionText = "Right"; break;
+            case "L": directionText = "Left"; break;
+            case "U": directionText = "Up"; break;
+            case "D": directionText = "Down"; break;
+            default: directionText = direction;
+        }
+        
+        return "Piece " + pieceId + " moves " + directionText + " " + distance + 
+            (distance > 1 ? " steps" : " step");
+    }
 }

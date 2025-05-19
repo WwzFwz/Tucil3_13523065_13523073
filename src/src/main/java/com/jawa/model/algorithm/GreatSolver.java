@@ -1,13 +1,18 @@
 package com.jawa.model.algorithm;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameState.Result;
 
-import java.util.*;
-
-public class GreatSolver {
+public class GreatSolver implements  Solver {
     private Heuristic heuristic;
 
     public GreatSolver(Heuristic heuristic) {
@@ -28,7 +33,7 @@ public class GreatSolver {
             this.f = f;
         }
     }
-
+    @Override
     public Result solve(Board initial) {
         long startTime = System.currentTimeMillis();
 
