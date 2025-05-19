@@ -1,12 +1,17 @@
-package com.jawa; 
+package com.jawa;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import com.jawa.model.algorithm.AStarSolver;
+import com.jawa.model.algorithm.BlockingHeuristic;
 import com.jawa.model.algorithm.GreatSolver;
+import com.jawa.model.algorithm.GreedySolver;
 import com.jawa.model.algorithm.Heuristic;
+import com.jawa.model.algorithm.ShortestHeuristic;
 import com.jawa.model.algorithm.Solver;
+import com.jawa.model.algorithm.UCLSolver;
 import com.jawa.model.algorithm.ZeroHeuristic;
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Movement;
@@ -38,63 +43,60 @@ import javafx.util.Duration;
 public class MainController {
     @FXML
     private Button uploadButton;
-    
+
     @FXML
     private Label fileNameLabel;
-    
+
     @FXML
     private ComboBox<String> algorithmComboBox;
-    
+
     @FXML
     private ComboBox<String> heuristicComboBox;
 
     @FXML
     private Button solveButton;
-    
+
     @FXML
     private Button backButton;
-    
+
     @FXML
     private Button playPauseButton;
-    
+
     @FXML
     private Button nextButton;
-    
+
     @FXML
     private ListView<String> stepsListView;
-    
+
     @FXML
     private Pagination stepsPagination;
-    
+
     @FXML
     private Label statusLabel;
-    
+
     @FXML
     private Pane boardPane;
-    
+
     private boolean fileUploaded = false;
     private File selectedFile;
     private Board board;
     private Board originalBoard;
     private Result result;
-    private final int stepsPerPage = 12;   
-    private Timeline playbackTimeline;   
-    private boolean isPlaying = false;  
-    private int currentStepIndex = -1;  
-
+    private final int stepsPerPage = 12;
+    private Timeline playbackTimeline;
+    private boolean isPlaying = false;
+    private int currentStepIndex = -1;
 
     @FXML
     private void initialize() {
         initializeBoard(6, 6);
 
-
         algorithmComboBox.getItems().addAll(
-            "A*", 
-            "Greedy Best-First", 
-            "Uniform-Cost Search"
-        );
-    
-        algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {           
+                "A*",
+                "Greedy Best-First",
+                "Uniform-Cost Search");
+
+        algorithmComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateHeuristicOptions(newValue);
         });
 
@@ -105,11 +107,11 @@ public class MainController {
         stepsPagination.setPageCount(1);
         stepsPagination.setCurrentPageIndex(0);
         stepsPagination.setMaxPageIndicatorCount(5);
-        
+
         stepsPagination.currentPageIndexProperty().addListener((obs, oldVal, newVal) -> {
             updateStepsListView(newVal.intValue());
         });
-        
+
         stepsListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal.intValue() >= 0 && result != null && result.getMovements() != null) {
                 int stepIndex = stepsPagination.getCurrentPageIndex() * stepsPerPage + newVal.intValue();
@@ -119,26 +121,26 @@ public class MainController {
             }
         });
 
-
     }
+
     private void initializeBoard(int rows, int cols) {
         boardPane.getChildren().clear();
-        
+
         GridPane boardGrid = new GridPane();
-        boardGrid.setHgap(2); 
-        boardGrid.setVgap(2); 
+        boardGrid.setHgap(2);
+        boardGrid.setVgap(2);
         boardGrid.setPadding(new Insets(10));
         double cellSize = calculateCellSize(rows, cols);
-        
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 StackPane cell = createCell(row, col, cellSize);
                 boardGrid.add(cell, col, row);
             }
         }
-    
+
         boardPane.getChildren().add(boardGrid);
-       
+
         boardGrid.layoutXProperty().bind(
                 boardPane.widthProperty().subtract(boardGrid.widthProperty()).divide(2));
         boardGrid.layoutYProperty().bind(
@@ -148,21 +150,20 @@ public class MainController {
     private void updateHeuristicOptions(String algorithm) {
         heuristicComboBox.getItems().clear();
         heuristicComboBox.setValue(null);
-        
+
         solveButton.setDisable(true);
-        
+
         if (!fileUploaded) {
             heuristicComboBox.setDisable(true);
             heuristicComboBox.setPromptText("Upload File First");
             return;
         }
-        
+
         if (algorithm == null) {
             heuristicComboBox.setDisable(true);
             heuristicComboBox.setPromptText("Select Algorithm First");
             return;
-        }
-        else {
+        } else {
             solveButton.setDisable(false);
         }
         switch (algorithm) {
@@ -170,20 +171,17 @@ public class MainController {
                 heuristicComboBox.setDisable(false);
                 heuristicComboBox.setPromptText("Select Heuristic");
                 heuristicComboBox.getItems().addAll(
-                    "Manhattan Distance", 
-                    "Blocking Vehicles", 
-                    "Advanced Blocking"
-                );
+                        "Shortest Distance",
+                        "Blocking Pieces");
                 break;
-                    
+
             case "Greedy Best-First":
                 heuristicComboBox.setDisable(false);
                 heuristicComboBox.getItems().addAll(
-                    "Manhattan Distance", 
-                    "Blocking Vehicles"
-                );
+                        "Shortest Distance",
+                        "Blocking Pieces");
                 break;
-                    
+
             case "Uniform-Cost Search":
                 heuristicComboBox.setDisable(true);
                 heuristicComboBox.setPromptText("No Heuristic Needed");
@@ -191,7 +189,7 @@ public class MainController {
                     solveButton.setDisable(false);
                 }
                 break;
-                    
+
             default:
                 heuristicComboBox.setDisable(true);
                 heuristicComboBox.setPromptText("Unknown Algorithm");
@@ -200,37 +198,36 @@ public class MainController {
 
     private void updateSolveButtonState() {
 
-        if (!fileUploaded) {   
+        if (!fileUploaded) {
             solveButton.setDisable(true);
             return;
         }
-        
-       
+
         String algorithm = algorithmComboBox.getValue();
         if (algorithm == null) {
             solveButton.setDisable(true);
-        }
-        else{
+        } else {
             solveButton.setDisable(false);
         }
     }
+
     private void updateStepsListView(int pageIndex) {
         System.err.println("Updating ListView for page " + pageIndex);
         stepsListView.getItems().clear();
-        
+
         if (result == null || result.getMovements().isEmpty()) {
             return;
         }
-        
+
         int startIndex = pageIndex * stepsPerPage;
         int endIndex = Math.min(startIndex + stepsPerPage, result.getMovements().size());
-        
+
         for (int i = startIndex; i < endIndex; i++) {
             Movement step = result.getMovements().get(i);
-            stepsListView.getItems().add("Step " + (i+1) + ": " + step.toString());
+            stepsListView.getItems().add("Step " + (i + 1) + ": " + step.toString());
             System.err.println(step);
         }
-        
+
         if (currentStepIndex >= startIndex && currentStepIndex < endIndex) {
             stepsListView.getSelectionModel().select(currentStepIndex - startIndex);
         }
@@ -241,70 +238,64 @@ public class MainController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Puzzle File");
         fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("Text Files", "*.txt")
-        );
+                new FileChooser.ExtensionFilter("Text Files", "*.txt"));
 
-   
         selectedFile = fileChooser.showOpenDialog(uploadButton.getScene().getWindow());
         try {
             board = IO.loadFromFile(selectedFile);
         } catch (Exception e) {
             fileNameLabel.setText("Error Occured : " + e.getMessage());
         }
-        initializeBoard(board.getRow(),board.getCol());
+        initializeBoard(board.getRow(), board.getCol());
         originalBoard = board.deepCopy();
         displayBoard(board);
         fileUploaded = true;
-        fileNameLabel.setText("File: " + selectedFile.getName()); 
+        fileNameLabel.setText("File: " + selectedFile.getName());
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
     }
     // @FXML
-    // private void handleSolve() {         
-    //     if(result != null) result = null;        
-    //         String algorithm = algorithmComboBox.getValue();    
-    //         String heuristicInput = heuristicComboBox.getValue();      
-    //         currentStepIndex= 0;                 
-    //         Heuristic ZeroHeuristic = new ZeroHeuristic();   
-    //         Solver solver = new GreatSolver(ZeroHeuristic);       
-    //         result = solver.solve(board);       
-    //         playPauseButton.setDisable(false);      
-    //         updateStepsListView(0);
-                                
+    // private void handleSolve() {
+    // if(result != null) result = null;
+    // String algorithm = algorithmComboBox.getValue();
+    // String heuristicInput = heuristicComboBox.getValue();
+    // currentStepIndex= 0;
+    // Heuristic ZeroHeuristic = new ZeroHeuristic();
+    // Solver solver = new GreatSolver(ZeroHeuristic);
+    // result = solver.solve(board);
+    // playPauseButton.setDisable(false);
+    // updateStepsListView(0);
+
     // }
     @FXML
     private void handleSolve() {
-      
-        if (result != null) result = null;
+
+        if (result != null)
+            result = null;
 
         String algorithm = algorithmComboBox.getValue();
         String heuristicChoice = heuristicComboBox.getValue();
-        currentStepIndex = -1; 
-        board = originalBoard.deepCopy(); 
-        
+        currentStepIndex = -1;
+        board = originalBoard.deepCopy();
+
         Heuristic selectedHeuristic;
-     
+
         if (heuristicChoice != null) {
             switch (heuristicChoice) {
-                case "Manhattan Distance":
-                    selectedHeuristic = new ZeroHeuristic();
+                case "Shortest Distance":
+                    selectedHeuristic = new ShortestHeuristic();
                     break;
-                case "Blocking Vehicles":
-                    selectedHeuristic = new ZeroHeuristic();
-                    break;
-                case "Advanced Blocking":
-                    selectedHeuristic = new ZeroHeuristic();
+                case "Blocking Pieces":
+                    selectedHeuristic = new BlockingHeuristic();
                     break;
                 default:
-              
                     selectedHeuristic = new ZeroHeuristic();
             }
         } else {
-    
+
             selectedHeuristic = new ZeroHeuristic();
         }
-        
 
         Solver solver;
         if (algorithm == null) {
@@ -312,22 +303,21 @@ public class MainController {
         } else {
             switch (algorithm) {
                 case "A*":
-                    solver = new GreatSolver(selectedHeuristic);  
+                    solver = new AStarSolver(selectedHeuristic);
                     break;
                 case "Greedy Best-First":
-                    solver = new GreatSolver(selectedHeuristic);
+                    solver = new GreedySolver(selectedHeuristic);
                     break;
                 case "Uniform-Cost Search":
-                    solver = new GreatSolver(selectedHeuristic);
+                    solver = new UCLSolver();
                     break;
                 default:
                     solver = new GreatSolver(selectedHeuristic);
             }
         }
-        
-   
+
         try {
-        
+
             statusLabel.setText("Solving puzzle...");
             result = solver.solve(board);
             if (result == null || result.getMovements() == null || result.getMovements().isEmpty()) {
@@ -340,15 +330,30 @@ public class MainController {
 
             nextButton.setDisable(result.getMovements().size() <= 1);
             playPauseButton.setDisable(false);
-            
+
             updateStepsListView(0);
-            statusLabel.setText("Solution found: " + result.getMovements().size() + 
-                                " steps in " + result.getSolvingTime() + "ms");
+            statusLabel.setText("Solution found: " + result.getMovements().size() +
+                    " steps in " + result.getSolvingTime() + "ms");
+            // munculin board saat ini
+            displayBoard(board);
+            Timeline timeline = new Timeline();
+            int n = result.getMovements().size();
+
+            for (int i = 0; i < n; i++) {
+                int step = i;
+                KeyFrame keyFrame = new KeyFrame(Duration.seconds(i), event -> {
+                    showSolutionStep(step);
+                });
+                timeline.getKeyFrames().add(keyFrame);
+            }
+
+            timeline.play();
         } catch (Exception e) {
             // e.printStackTrace();
             statusLabel.setText("Error: " + e.getMessage());
         }
     }
+
     @FXML
     private void handleBack() {
         if (currentStepIndex > 0) {
@@ -364,16 +369,15 @@ public class MainController {
         }
     }
 
-
     @FXML
     private void handlePlayPause() {
         List<Movement> solutionSteps = result.getMovements();
         if (solutionSteps == null || solutionSteps.isEmpty()) {
             return;
         }
-        
+
         if (isPlaying) {
-           
+
             playPauseButton.setText("▶");
             if (playbackTimeline != null) {
                 playbackTimeline.stop();
@@ -383,76 +387,46 @@ public class MainController {
             isPlaying = true;
             playPauseButton.setText("⏸");
             startPlayback();
-           
+
         }
     }
+
     private void startPlayback() {
         if (playbackTimeline != null) {
             playbackTimeline.stop();
         }
-        
+
         playbackTimeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), e -> {
-                if (currentStepIndex < result.getMovements().size() - 1) {
-               
-                showSolutionStep(currentStepIndex + 1);
-                   
-                } else {
-                    playPauseButton.setText("▶");
-                    isPlaying = false;
-                    playbackTimeline.stop();
-                }
-            })
-        );
-        
+                new KeyFrame(Duration.seconds(1), e -> {
+                    List<Movement> movements = result.getMovements();
+                    if (movements == null || movements.isEmpty()) {
+                        playbackTimeline.stop();
+                        isPlaying = false;
+                        playPauseButton.setText("▶");
+                        return;
+                    }
+
+                    if (currentStepIndex < movements.size() - 1) {
+                        currentStepIndex++; // ✅ Increment sebelum dipakai
+                        showSolutionStep(currentStepIndex);
+                    } else {
+                        playbackTimeline.stop();
+                        isPlaying = false;
+                        playPauseButton.setText("▶");
+                    }
+                }));
+
         playbackTimeline.setCycleCount(Timeline.INDEFINITE);
         playbackTimeline.play();
+        isPlaying = true;
+        playPauseButton.setText("⏸"); // Opsional: ubah ke "pause" saat mulai
     }
-        // private void startPlayback() {
-        //     List<Movement> solutionSteps = result.getMovements();
-        //     if (playbackTimeline != null) {
-        //         playbackTimeline.stop();
-        //     }
-            
-        //     // Create a single-step timeline instead of a continuous one
-        //     playbackTimeline = new Timeline();
-            
-        //     // Add a key frame to move to the next step
-        //     KeyFrame keyFrame = new KeyFrame(javafx.util.Duration.seconds(1), e -> {
-        //         if (currentStepIndex < solutionSteps.size() - 1) {
-        //             int nextStep = currentStepIndex + 1;
-        //             System.out.println("Timeline advancing to step: " + nextStep);
-        //             showSolutionStep(nextStep);
-                    
-        //             // If we're not at the end and still playing, schedule the next step
-        //             if (nextStep < solutionSteps.size() - 1 && isPlaying) {
-        //                 // Schedule next step by creating a new timeline
-        //                 Platform.runLater(this::startPlayback);
-        //             } else if (nextStep >= solutionSteps.size() - 1) {
-        //                 // At the end, reset play button
-        //                 playPauseButton.setText("▶");
-        //                 isPlaying = false;
-        //             }
-        //         } else {
-        //             playPauseButton.setText("▶");
-        //             isPlaying = false;
-        //         }
-        //     });
-            
-        //     // Add the key frame to timeline
-        //     playbackTimeline.getKeyFrames().add(keyFrame);
-            
-        //     // Play once (not indefinitely)
-        //     playbackTimeline.setCycleCount(1);
-        //     playbackTimeline.play();
-        // }
-
 
     private StackPane createCell(int row, int col, double size) {
         Rectangle cellBg = new Rectangle(size, size);
-        cellBg.setFill(Color.web("#1a1158")); 
-        cellBg.setStroke(Color.web("#4287f5")); 
-        cellBg.setStrokeWidth(1.5); 
+        cellBg.setFill(Color.web("#1a1158"));
+        cellBg.setStroke(Color.web("#4287f5"));
+        cellBg.setStrokeWidth(1.5);
         StackPane cell = new StackPane(cellBg);
         cell.setId("cell_" + row + "_" + col);
         return cell;
@@ -461,23 +435,29 @@ public class MainController {
     private double calculateCellSize(int rows, int cols) {
         double availableWidth = boardPane.getWidth();
         double availableHeight = boardPane.getHeight();
-        if (availableWidth <= 0) availableWidth = boardPane.getPrefWidth();
-        if (availableHeight <= 0) availableHeight = boardPane.getPrefHeight();
-        
-        if (availableWidth <= 0) availableWidth = 400;
-        if (availableHeight <= 0) availableHeight = 400;
-        
-        availableWidth -= 40; 
-        availableHeight -= 40; 
-        
+        if (availableWidth <= 0)
+            availableWidth = boardPane.getPrefWidth();
+        if (availableHeight <= 0)
+            availableHeight = boardPane.getPrefHeight();
+
+        if (availableWidth <= 0)
+            availableWidth = 400;
+        if (availableHeight <= 0)
+            availableHeight = 400;
+
+        availableWidth -= 40;
+        availableHeight -= 40;
+
         double maxCellWidth = availableWidth / cols;
         double maxCellHeight = availableHeight / rows;
-        
+
         double cellSize = Math.min(maxCellWidth, maxCellHeight);
 
-        if (cellSize > 60) cellSize = 60; 
+        if (cellSize > 60)
+            cellSize = 60;
 
-        if (cellSize < 20) cellSize = 20; 
+        if (cellSize < 20)
+            cellSize = 20;
         return cellSize;
     }
 
@@ -490,43 +470,42 @@ public class MainController {
             displaySinglePiece(boardGrid, piece, cellSize);
         }
     }
+
     private void clearPieces(GridPane boardGrid) {
-        boardGrid.getChildren().removeIf(node -> 
-            !(node instanceof StackPane) || 
-            !((StackPane) node).getId().startsWith("cell_"));
+        boardGrid.getChildren().removeIf(node -> !(node instanceof StackPane) ||
+                !((StackPane) node).getId().startsWith("cell_"));
     }
 
     private void displaySinglePiece(GridPane boardGrid, Piece piece, double cellSize) {
         Rectangle pieceRect = new Rectangle();
-        
+
         if (piece.isHorizontal()) {
-            pieceRect.setWidth(cellSize * piece.getLength() - 4); 
+            pieceRect.setWidth(cellSize * piece.getLength() - 4);
             pieceRect.setHeight(cellSize - 4);
         } else {
             pieceRect.setWidth(cellSize - 4);
             pieceRect.setHeight(cellSize * piece.getLength() - 4);
         }
-        
 
         pieceRect.setFill(piece.getColor());
         pieceRect.setStroke(Color.BLACK);
         pieceRect.setStrokeWidth(2);
         pieceRect.setArcWidth(10);
         pieceRect.setArcHeight(10);
- 
+
         pieceRect.setOnMouseEntered(e -> pieceRect.setOpacity(0.8));
         pieceRect.setOnMouseExited(e -> pieceRect.setOpacity(1.0));
 
         StackPane pieceContainer = new StackPane();
         pieceContainer.getChildren().add(pieceRect);
- 
+
         Label idLabel = new Label(piece.getId());
         idLabel.setTextFill(Color.WHITE);
         idLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         pieceContainer.getChildren().add(idLabel);
-        
+
         pieceContainer.setId(piece.getId());
-        
+
         Position pos = piece.getPosition();
         if (piece.isHorizontal()) {
             GridPane.setColumnSpan(pieceContainer, piece.getLength());
@@ -540,23 +519,23 @@ public class MainController {
     private void updateSinglePiece(String pieceId) {
         GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
         Piece piece = board.getPieces().get(pieceId);
-        
-        if (piece == null) return;
-    
+
+        if (piece == null)
+            return;
+
         StackPane pieceNode = null;
         for (Node node : boardGrid.getChildren()) {
-            if (node instanceof StackPane && 
-                node.getId() != null && 
-                node.getId().equals(pieceId)) {
+            if (node instanceof StackPane &&
+                    node.getId() != null &&
+                    node.getId().equals(pieceId)) {
                 pieceNode = (StackPane) node;
                 break;
             }
         }
-        
 
         if (pieceNode != null) {
             boardGrid.getChildren().remove(pieceNode);
-            
+
             Position pos = piece.getPosition();
             if (piece.isHorizontal()) {
                 GridPane.setColumnSpan(pieceNode, piece.getLength());
@@ -565,59 +544,30 @@ public class MainController {
                 GridPane.setRowSpan(pieceNode, piece.getLength());
                 boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
             }
-        } 
-        else {
+        } else {
             double cellSize = calculateCellSize(board.getRows(), board.getCols());
             displaySinglePiece(boardGrid, piece, cellSize);
         }
     }
 
     private void showSolutionStep(int stepIndex) {
-        System.err.println("dipanngil");
         List<Movement> solutionSteps = result.getMovements();
         if (solutionSteps == null || stepIndex < 0 || stepIndex >= solutionSteps.size()) {
             return;
         }
-       
-        if (currentStepIndex == -1 || Math.abs(stepIndex - currentStepIndex) > 1) {
-            board = originalBoard.deepCopy();
-            
-            for (int i = 0; i <= stepIndex; i++) {
-                Movement move = solutionSteps.get(i);
-                Piece piece = board.getPieces().get(move.getPieceId());
-                if (piece != null) {
-                    piece.move(move.getDirection(), move.getDistance());
-                }
-            }
-            displayBoard(board);
-        } 
 
-        else {
-         
-            Movement movement;
-            if (stepIndex > currentStepIndex) {
-                movement = solutionSteps.get(stepIndex);
-                Piece piece = board.getPieces().get(movement.getPieceId());
-                if (piece != null) {
-                    piece.move(movement.getDirection(), movement.getDistance());
-                }
-            } else {
-                movement = solutionSteps.get(currentStepIndex);
-                Piece piece = board.getPieces().get(movement.getPieceId());
-                if (piece != null) {
-                    piece.move(board.getOppositeDirection(movement.getDirection()), movement.getDistance());
-                }
+        // Selalu rebuild board dari awal sampai stepIndex
+        board = originalBoard.deepCopy();
+        for (int i = 0; i <= stepIndex; i++) {
+            Movement move = solutionSteps.get(i);
+            Piece piece = board.getPieces().get(move.getPieceId());
+            if (piece != null) {
+                piece.move(move.getDirection(), move.getDistance());
             }
-            
-            updateSinglePiece(movement.getPieceId());
         }
-        
-         try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) { }
+        displayBoard(board);
 
         currentStepIndex = stepIndex;
-        
 
         int pageIndex = stepIndex / stepsPerPage;
         if (pageIndex != stepsPagination.getCurrentPageIndex()) {
@@ -626,15 +576,11 @@ public class MainController {
             int listIndex = stepIndex % stepsPerPage;
             stepsListView.getSelectionModel().select(listIndex);
         }
-      
+
         backButton.setDisable(stepIndex == 0);
         nextButton.setDisable(stepIndex == solutionSteps.size() - 1);
-        
+
         statusLabel.setText("Step " + (stepIndex + 1) + " of " + solutionSteps.size());
     }
-    // private void dummySolve() {
-        
-  
-    //     result.getMovements().add(new Movement("A", "R", 1));     
-    // }
+
 }
