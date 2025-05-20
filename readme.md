@@ -29,7 +29,7 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 
 ## Cara Menjalankan Program 2 (Jika ingin compile ulang)
 1. Pastikan sudah mendownload requirement wajib
-2. Masuk ke src
+2. Setelah clone/extract zip dan telah membuka folder lalu masuklah ke src
 ```
 cd src
 ```
