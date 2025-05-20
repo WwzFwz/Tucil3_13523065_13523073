@@ -75,6 +75,12 @@
                </VBox.margin>
             </Button>
             
+            <!-- Add this after the solve button in your FXML file -->
+            <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSaveSolution" styleClass="save-button" text="Save Solution" disable="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </Button>
             <Separator>
                <VBox.margin>
                   <Insets bottom="10.0" />

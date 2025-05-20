@@ -1,6 +1,7 @@
 package com.jawa;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -77,6 +79,9 @@ public class MainController {
     @FXML
     private Pane boardPane;
 
+    @FXML
+    private Button saveButton;
+
     private boolean fileUploaded = false;
     private File selectedFile;
     private Board board;
@@ -112,6 +117,7 @@ public class MainController {
             updateStepsListView(newVal.intValue());
         });
 
+        saveButton.setDisable(true);
         stepsListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal.intValue() >= 0 && result != null && result.getMovements() != null) {
                 int stepIndex = stepsPagination.getCurrentPageIndex() * stepsPerPage + newVal.intValue();
@@ -254,20 +260,8 @@ public class MainController {
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
+        solveButton.setDisable(true);
     }
-    // @FXML
-    // private void handleSolve() {
-    // if(result != null) result = null;
-    // String algorithm = algorithmComboBox.getValue();
-    // String heuristicInput = heuristicComboBox.getValue();
-    // currentStepIndex= 0;
-    // Heuristic ZeroHeuristic = new ZeroHeuristic();
-    // Solver solver = new GreatSolver(ZeroHeuristic);
-    // result = solver.solve(board);
-    // playPauseButton.setDisable(false);
-    // updateStepsListView(0);
-
-    // }
     @FXML
     private void handleSolve() {
 
@@ -324,6 +318,7 @@ public class MainController {
                 statusLabel.setText("No solution found.");
                 return;
             }
+            saveButton.setDisable(false);
             int totalPages = (int) Math.ceil((double) result.getMovements().size() / stepsPerPage);
             stepsPagination.setPageCount(Math.max(1, totalPages));
             stepsPagination.setCurrentPageIndex(0);
@@ -332,10 +327,12 @@ public class MainController {
             playPauseButton.setDisable(false);
 
             updateStepsListView(0);
-            statusLabel.setText("Solution found: " + "Node : "   + result.getNodesExpanded()+
-                    " steps in " + result.getSolvingTime() + "ms");
+            statusLabel.setText( result.getNodesExpanded()+ " Nodes explored" + 
+                    " in " + result.getSolvingTime() + "ms");
             // munculin board saat ini
             displayBoard(board);
+            solveButton.setDisable(true);
+
             // startPlayback();
         } catch (Exception e) {
             // e.printStackTrace();
@@ -569,7 +566,45 @@ public class MainController {
         backButton.setDisable(stepIndex == 0);
         nextButton.setDisable(stepIndex == solutionSteps.size() - 1);
 
-        statusLabel.setText("Step " + (stepIndex + 1) + " of " + solutionSteps.size());
+        // statusLabel.setText("Step " + (stepIndex + 1) + " of " + solutionSteps.size());
     }
-
+    @FXML
+    private void handleSaveSolution() {
+        if (result == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No solution available to save.");
+            return;
+        }
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Solution");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+        
+        // Set initial filename based on the loaded puzzle file name
+        String initialFileName = "solution.txt";
+        fileChooser.setInitialFileName(initialFileName);
+        
+        File file = fileChooser.showSaveDialog(saveButton.getScene().getWindow());
+        if (file != null) {
+            try {
+                IO.saveResultToFile(originalBoard, result, file);
+                
+                showAlert(Alert.AlertType.INFORMATION, "Success", 
+                    "Solution saved successfully to: " + file.getAbsolutePath());
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", 
+                    "Failed to save solution: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+// Add a helper method for showing alerts
+private void showAlert(Alert.AlertType type, String title, String content) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(content);
+    alert.showAndWait();
+}
 }

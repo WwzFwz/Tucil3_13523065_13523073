@@ -232,3 +232,19 @@ Label {
 .completed-step:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(76,175,80,0.5), 8, 0, 0, 0);
 }
+
+
+.save-button {
+    -fx-background-color: #2e7d32; 
+    -fx-font-size: 14px;
+}
+
+.save-button:hover {
+    -fx-background-color: #4caf50; 
+}
+
+.save-button:disabled {
+    -fx-opacity: 0.8;
+    -fx-background-color: #0d0545; 
+    -fx-text-fill: -fx-disabled-text;
+}

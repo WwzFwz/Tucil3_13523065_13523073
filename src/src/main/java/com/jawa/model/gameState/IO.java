@@ -1,8 +1,10 @@
 package com.jawa.model.gameState;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jawa.model.gameComponent.Board;
+import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 
@@ -198,7 +201,151 @@ public class IO {
                     entry.getKey() == 'P');
             board.addPiece(piece);
         }
+            // Map<String,Piece> pieces = board.getPieces();
+            // for (Map.Entry<String, Piece> entry  : pieces.entrySet()) {
 
-        return board;
+            //     System.out.println(entry.getValue());
+            // }
+            // System.out.println(board.getExitPosition());;
+
+            return board;
+        }
+
+public static void saveResultToFile(Board initialBoard, Result result, File file) throws IOException {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+
+        Board currentBoard = new Board(initialBoard);
+
+        Board finalBoard = new Board(initialBoard);
+        List<Movement> moves = result.getMoves();
+        for (Movement move : moves) {
+            Piece piece = finalBoard.getPieces().get(move.getPieceId());
+            piece.move(move.getDirection(), move.getDistance());
+        }
+
+        Piece primaryPiece = finalBoard.getPieces().get("P");
+        Position exitPosition = determineExitPosition(finalBoard, primaryPiece);
+        
+        writer.write("Puzzle Solution\n");
+        writer.write("==============\n");
+        writer.write(String.format("Solving Time: %d ms\n", result.getSolvingTime()));
+        writer.write(String.format("Nodes Expanded: %d\n", result.getNodesExpanded()));
+        writer.write(String.format("Total Moves: %d\n\n", result.getMoves().size()));
+        
+        writer.write("Initial State\n");
+        writer.write(boardToStringWithExit(currentBoard, exitPosition));
+        writer.write("\n"); 
+        
+        for (int i = 0; i < moves.size(); i++) {
+            Movement move = moves.get(i);
+            Piece piece = currentBoard.getPieces().get(move.getPieceId());
+
+            piece.move(move.getDirection(), move.getDistance());
+            
+            writer.write(String.format("Move %d: %s-%s %d\n", 
+                i+1, 
+                move.getPieceId(), 
+                getDirectionName(move.getDirection()), 
+                move.getDistance()));
+            writer.write(boardToStringWithExit(currentBoard, exitPosition));
+            writer.write("\n"); 
+        }
     }
+}
+
+
+private static Position determineExitPosition(Board solvedBoard, Piece primaryPiece) {
+    int pr = primaryPiece.getRow();
+    int pc = primaryPiece.getCol();
+    
+    if (primaryPiece.isHorizontal()) {
+        if (pc == 0) {
+            return new Position(pr, -1);
+        } else if (pc + primaryPiece.getLength() == solvedBoard.getCols()) {
+            return new Position(pr, solvedBoard.getCols());
+        }
+    } else {
+        if (pr == 0) {
+            return new Position(-1, pc);
+        } else if (pr + primaryPiece.getLength() == solvedBoard.getRows()) {
+            return new Position(solvedBoard.getRows(), pc);
+        }
+    }
+    
+
+    return new Position(2, -1);
+}
+
+
+private static String getDirectionName(String direction) {
+    switch (direction) {
+        case "R": return "right";
+        case "L": return "left";
+        case "U": return "up";
+        case "D": return "down";
+        default: return direction;
+    }
+}
+
+private static String boardToStringWithExit(Board board, Position exitPos) {
+    int rows = board.getRows();
+    int cols = board.getCols();
+    
+    char[][] extendedGrid = new char[rows + 2][cols + 2];
+        for (int r = 0; r < rows + 2; r++) {
+        for (int c = 0; c < cols + 2; c++) {
+            extendedGrid[r][c] = ' ';
+        }
+    }
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            extendedGrid[r + 1][c + 1] = '.';
+        }
+    }
+    
+
+    for (Piece piece : board.getPieces().values()) {
+        String id = piece.getId();
+        int row = piece.getRow();
+        int col = piece.getCol();
+        int length = piece.getLength();
+        boolean isHorizontal = piece.isHorizontal();
+        
+        for (int i = 0; i < length; i++) {
+            int r = row + (isHorizontal ? 0 : i);
+            int c = col + (isHorizontal ? i : 0);
+            
+            if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                extendedGrid[r + 1][c + 1] = id.charAt(0);
+            }
+        }
+    }
+    
+    if (exitPos != null) {
+        int exitRow = exitPos.getRow();
+        int exitCol = exitPos.getCol();
+        
+        if (exitRow < 0) {
+            extendedGrid[0][exitCol + 1] = 'K';
+        } else if (exitRow >= rows) {
+            extendedGrid[rows + 1][exitCol + 1] = 'K';
+        } else if (exitCol < 0) {
+            extendedGrid[exitRow + 1][0] = 'K';
+        } else if (exitCol >= cols) {
+            extendedGrid[exitRow + 1][cols + 1] = 'K';
+        }
+    } else {
+        extendedGrid[3][0] = 'K';
+    }
+    StringBuilder result = new StringBuilder();
+    for (int r = 0; r < rows + 2; r++) {
+        for (int c = 0; c < cols + 2; c++) {
+            result.append(extendedGrid[r][c]);
+        }
+        result.append('\n');
+    }
+    
+    return result.toString();
+}
 }
