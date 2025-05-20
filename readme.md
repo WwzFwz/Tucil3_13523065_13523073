@@ -1,6 +1,6 @@
-#  Puzzle Rush Hour 
+#  Rush Hour 
 
-[ Puzzle Rush Hour ](doc/awok.png)
+![Rush Hour ](doc/awok.png)
 
 ## Deskripsi Program
 Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang menggunakan **algoritma Path Finding** dengan teknik . Program ini memiliki fitur utama sebagai berikut:
@@ -51,7 +51,7 @@ java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules j
 
 Note :   
 -"C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diinstal (path yg saya mont auntuk dicopy sblmnya)
-- "target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
+-"target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
 
 
 ## Struktur File
