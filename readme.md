@@ -62,7 +62,8 @@ Note :
 ```
 java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules javafx.controls,javafx.fxml -cp bin/target/classes com.jawa.App
 ```
-
+Note :   
+- "C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diextract (path yg saya minta auntuk dicopy sblmnya)
 
 ## Struktur File
 ```
