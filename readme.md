@@ -1,6 +1,6 @@
 #  Puzzle Rush Hour 
 
-[ Puzzle Rush Hour ](doc/alfi.png)
+[ Puzzle Rush Hour ](doc/awok.png)
 
 ## Deskripsi Program
 Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang menggunakan **algoritma Path Finding** dengan teknik . Program ini memiliki fitur utama sebagai berikut:
@@ -26,7 +26,19 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 3. Tekan Run pada method main
 
 
-## Cara Menjalankan Program 2 (Menggunakan executable file yang telah ada )
+
+## Cara Menjalankan Program 2 (Jika ingin compile ulang)
+1. Pastikan sudah mendownload requirement wajib
+2. Masuk ke src
+```
+cd src
+```
+3. Jalankan perintah ini jika ingin membuat ulang executable file
+```
+mvn clean javafx:run
+```
+
+## Cara Menjalankan Program 3 (Menggunakan executable file yang telah ada )
 1. Pastikan sudah mendownload requirement wajib
 2. Masuk ke src 
 ```
@@ -40,18 +52,6 @@ java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules j
 Note :   
 -"C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diinstal (path yg saya mont auntuk dicopy sblmnya)
 - "target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
-## Cara Menjalankan Program 3 (Jika ingin compile ulang)
-1. Pastikan sudah mendownload requirement wajib
-2. Masuk ke src
-```
-cd src
-```
-3. Jalankan perintah ini jika ingin membuat ulang executable file
-```
-mvn clean javafx:run
-```
-
-
 
 
 ## Struktur File
@@ -70,7 +70,25 @@ Tuci3_13523065_13523073
 ├── test/
 │     ├── input/        # Input percobaan puzzle dalam txt
 │     ├── output/       # Output Hasil percobaan
+
 ```
+## Penjelasan GUI
+Pada Graphical User Interface kami, user akan diminta memberi masukan sesuai alur input yang tertera pada spek tugas kecil. Suatu button atau combobox akan di disable(lock) jika user belum memasukkan input yang diminta sebelumnya.
+Adapun berikut keterangan button, combobox, serta component pada aplikasi kami : 
+1. Select File Button :  Button yang bila ditekan akan menampilkan folder sehingga user dapat memasukkan masukan file
+2. Algorithm Combobox : Combobox yang bila ditekan akan menampilkan list algoritma yang tersedia
+3. Heuristic Combobox : Combobox yang bila ditekan akan menampilkan list heuristic yang tersedia untuk suatu algoritma yang telah dipilih sebelumnya
+4. Solve Button : Button yang bila ditekan akan menjalankan program solver sesuai dengan algoritma dan atau heuristic yang telah dipilih sebelumnya
+5. Play Button : Button yang bila ditekan akan menjalankan animasi dari suatu state ke solusi
+6. Pause Button : Button yang bila ditekan akan menge-pause 
+7. Next button : Button yang bila ditekan akan menampilkan step selanjutnya relative dari step sekarang
+8. Back Button : Button yang bila ditekan akan menampilka step sebelumnya relative dari step sekarang
+9. Solution Steps : Keterangan setiap langkah yang terjadi hingga mencapai solution
+10. Pagination :  Hasil dari solusion steps dipaginasi, maksimum step list yang ditampilkan berjumlah x dan maksimum keterangan halaman yang ditampilkan berjumlah y , 	
+11. Next Pagination Button : Lanjut ke halaman selanjutnya
+12. Back Pagination Button : Kembali ke halaman sebelumnya
+13. Board : visualisasi board, dapat menvisualisasikan board dalam tiap langkah
+
 
 ## Contributors
 
