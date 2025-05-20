@@ -9,11 +9,9 @@ public class Result {
     private long solvingTime;
     private int nodesExpanded;
 
-    // Konstruktor default
     public Result() {
     }
 
-    // Konstruktor lengkap untuk inisialisasi sekaligus (optional)
     public Result(List<Movement> moves, long solvingTime, int nodesExpanded) {
         this.moves = moves;
         this.solvingTime = solvingTime;

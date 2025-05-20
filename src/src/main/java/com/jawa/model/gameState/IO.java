@@ -18,66 +18,6 @@ import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 
 public class IO {
-
-    public static Board loadFromFile(String path) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        String[] dim = br.readLine().split(" ");
-        int rows = Integer.parseInt(dim[0]);
-        int cols = Integer.parseInt(dim[1]);
-
-        int pieceCount = Integer.parseInt(br.readLine());
-
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < rows; i++) {
-            lines.add(br.readLine());
-        }
-        br.close();
-
-        Board board = new Board(rows, cols, pieceCount);
-        char[][] grid = new char[rows][];
-        for (int i = 0; i < rows; i++) {
-            grid[i] = lines.get(i).toCharArray();
-        }
-
-        Map<Character, List<Position>> piecePositions = new HashMap<>();
-
-        // Cari semua karakter dan simpan posisinya, kecuali '.' dan 'K'
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < grid[r].length; c++) {
-                char ch = grid[r][c];
-                if (ch == '.')
-                    continue;
-                if (ch == 'K') {
-                    if (r < 0 || r >= rows || c < 0 || c >= cols ||
-                            r == 0 || r == rows - 1 || c == 0 || c == cols - 1) {
-                        board.setExitPosition(new Position(r, c));
-                    }
-                    continue;
-                }
-                piecePositions.putIfAbsent(ch, new ArrayList<>());
-                piecePositions.get(ch).add(new Position(r, c));
-            }
-        }
-
-        // Buat Piece dari kumpulan posisi
-        for (Map.Entry<Character, List<Position>> entry : piecePositions.entrySet()) {
-            char id = entry.getKey();
-            List<Position> posList = entry.getValue();
-            posList.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
-            Position first = posList.get(0);
-
-            boolean isHorizontal = posList.size() > 1 && posList.get(1).getRow() == first.getRow();
-            int length = posList.size();
-            boolean isPrimary = id == 'P';
-
-            Piece piece = new Piece(String.valueOf(id), first.getRow(), first.getCol(), length, isHorizontal,
-                    isPrimary);
-            board.addPiece(piece);
-        }
-
-        return board;
-    }
-
     public static Board loadFromFile(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String[] dim = br.readLine().trim().split("\\s+");
@@ -86,7 +26,6 @@ public class IO {
 
         int pieceCount = Integer.parseInt(br.readLine().trim());
 
-        // Baca semua baris tanpa melakukan trim
         List<String> allLines = new ArrayList<>();
         String line;
         while ((line = br.readLine()) != null) {
@@ -94,18 +33,15 @@ public class IO {
         }
         br.close();
 
-        // Cari posisi exit (K) di seluruh file
         Position exitPos = null;
         int actualRows = allLines.size();
         int offsetX = 0;
         int offsetY = 0;
-
-        // Loop melalui setiap karakter di semua baris
         outerLoop: for (int r = 0; r < actualRows; r++) {
             String currentLine = allLines.get(r);
             for (int c = 0; c < currentLine.length(); c++) {
                 if (currentLine.charAt(c) == 'K') {
-                    // Tentukan posisi relatif terhadap board yang dideklarasikan
+
                     boolean isInsideBoard = (r < declaredRows) && (c < declaredCols);
                     if (r == 0) {
                         int exitRow = 0;
@@ -131,11 +67,6 @@ public class IO {
                         exitPos = new Position(exitRow, exitCol);
                         System.out.println(exitRow + " " + exitCol);
                     } else if (c == 0) {
-                        // offsetX = 1;
-                        // offsetY = 0;
-                        // int exitRow = r;
-                        // int exitCol = 1;
-                        // exitPos = new Position(exitRow, exitCol);
                         int exitCol = 1;
                         if (declaredCols + 1 <= currentLine.length()) {
                             offsetX = 1;
@@ -157,36 +88,20 @@ public class IO {
 
                     break outerLoop;
 
-                    // if (isInsideBoard) {
-                    // // Pastikan K berada di tepi board
-                    // if (r == 0 || r == declaredRows - 1 || c == 0 || c == declaredCols - 1) {
-                    // exitPos = new Position(r, c);
-                    // break outerLoop;
-                    // }
-                    // } else {
-                    // // Hitung posisi exit di luar board
-                    // int exitRow = (r < declaredRows) ? r : (r < 0 ? -1 : declaredRows);
-                    // int exitCol = (c < declaredCols) ? -1 : declaredCols;
-                    // exitPos = new Position(exitRow, exitCol);
-                    // break outerLoop;
-                    // }
                 }
             }
         }
 
-        // Bangun grid resmi dengan konversi spasi ke '.'
         List<String> boardLines = new ArrayList<>();
         for (int i = offsetY; i < declaredRows + offsetY; i++) {
             String rawLine = i < allLines.size() ? allLines.get(i) : "";
             StringBuilder processedLine = new StringBuilder();
-
-            // Konversi karakter per kolom
             for (int c = offsetX; c < declaredCols + offsetX; c++) {
                 if (c < rawLine.length()) {
                     char ch = rawLine.charAt(c);
                     processedLine.append(ch == ' ' ? '.' : ch);
                 } else {
-                    processedLine.append('.'); // Padding
+                    processedLine.append('.'); 
                 }
             }
             boardLines.add(processedLine.toString());
@@ -197,7 +112,7 @@ public class IO {
             board.setExitPosition(exitPos);
         }
 
-        // Proses piece dari grid yang sudah dibersihkan
+
         Map<Character, List<Position>> pieceMap = new HashMap<>();
         for (int r = 0; r < declaredRows; r++) {
             String boardRow = boardLines.get(r);
@@ -210,7 +125,6 @@ public class IO {
             }
         }
 
-        // Bangun objek Piece
         for (Map.Entry<Character, List<Position>> entry : pieceMap.entrySet()) {
             List<Position> positions = entry.getValue();
             positions.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
@@ -228,12 +142,6 @@ public class IO {
                     entry.getKey() == 'P');
             board.addPiece(piece);
         }
-        // Map<String,Piece> pieces = board.getPieces();
-        // for (Map.Entry<String, Piece> entry : pieces.entrySet()) {
-
-        // System.out.println(entry.getValue());
-        // }
-        // System.out.println(board.getExitPosition());;
 
         return board;
     }
@@ -375,5 +283,61 @@ public class IO {
         }
 
         return result.toString();
+    }
+
+    public static Board loadFromFile(String path) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String[] dim = br.readLine().split(" ");
+        int rows = Integer.parseInt(dim[0]);
+        int cols = Integer.parseInt(dim[1]);
+
+        int pieceCount = Integer.parseInt(br.readLine());
+
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            lines.add(br.readLine());
+        }
+        br.close();
+
+        Board board = new Board(rows, cols, pieceCount);
+        char[][] grid = new char[rows][];
+        for (int i = 0; i < rows; i++) {
+            grid[i] = lines.get(i).toCharArray();
+        }
+
+        Map<Character, List<Position>> piecePositions = new HashMap<>();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < grid[r].length; c++) {
+                char ch = grid[r][c];
+                if (ch == '.')
+                    continue;
+                if (ch == 'K') {
+                    if (r < 0 || r >= rows || c < 0 || c >= cols ||
+                            r == 0 || r == rows - 1 || c == 0 || c == cols - 1) {
+                        board.setExitPosition(new Position(r, c));
+                    }
+                    continue;
+                }
+                piecePositions.putIfAbsent(ch, new ArrayList<>());
+                piecePositions.get(ch).add(new Position(r, c));
+            }
+        }
+
+        for (Map.Entry<Character, List<Position>> entry : piecePositions.entrySet()) {
+            char id = entry.getKey();
+            List<Position> posList = entry.getValue();
+            posList.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
+            Position first = posList.get(0);
+
+            boolean isHorizontal = posList.size() > 1 && posList.get(1).getRow() == first.getRow();
+            int length = posList.size();
+            boolean isPrimary = id == 'P';
+
+            Piece piece = new Piece(String.valueOf(id), first.getRow(), first.getCol(), length, isHorizontal,
+                    isPrimary);
+            board.addPiece(piece);
+        }
+
+        return board;
     }
 }

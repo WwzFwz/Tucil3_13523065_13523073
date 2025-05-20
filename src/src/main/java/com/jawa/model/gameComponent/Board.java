@@ -11,33 +11,10 @@ public class Board {
     private int rows;
     private int cols;
     private int countPiece;
-    private Map<String, Piece> pieces; // key = piece_id
+    private Map<String, Piece> pieces; 
     private Position exitPosition;
 
-    private static final String[] ANSI_COLORS = { // buat cli
-            "\u001B[31m", // A → merah
-            "\u001B[32m", // B → hijau
-            "\u001B[33m", // C → kuning
-            "\u001B[34m", // D → biru
-            "\u001B[35m", // E → magenta
-            "\u001B[36m", // F → cyan
-            "\u001B[91m", // G → merah terang
-            "\u001B[92m", // H → hijau terang
-            "\u001B[93m", // I → kuning terang
-            "\u001B[94m", // J → biru terang
-            "\u001B[95m", // K → magenta terang (exit bila ingin ditampilkan)
-            "\u001B[96m", // L → cyan terang
-            "\u001B[37m", // M → putih
-    };
 
-    private static String colorize(char ch) {
-        if (ch == '.')
-            return ".";
-        if (ch == 'P')
-            return "\u001B[35mP\u001B[0m"; // primary = ungu
-        int idx = (ch - 'A') % ANSI_COLORS.length;
-        return ANSI_COLORS[idx] + ch + "\u001B[0m";
-    }
 
     public Board(int rows, int cols, int countPiece) {
         this.rows = rows;
@@ -61,65 +38,6 @@ public class Board {
         pieces.put(p.getId(), p);
     }
 
-    public int getRow() {
-        return this.rows;
-    }
-
-    public int getCol() {
-        return this.cols;
-    }
-
-    public Position getExitPosition() {
-        return exitPosition;
-    }
-
-    public void setExitPosition(Position exitPosition) {
-        this.exitPosition = exitPosition;
-    }
-
-    public Map<String, Piece> getPieces() {
-        return pieces;
-    }
-
-    public void printBoard() {
-        char[][] grid = new char[rows][cols];
-
-        // 1. Default semua cell jadi '.'
-        for (int r = 0; r < rows; r++) {
-            Arrays.fill(grid[r], '.');
-        }
-
-        // 2. Tempatkan semua pieces
-        for (Piece p : pieces.values()) {
-            int pr = p.getRow();
-            int pc = p.getCol();
-            for (int i = 0; i < p.getLength(); i++) {
-                int r = pr + (!p.isHorizontal() ? i : 0);
-                int c = pc + (p.isHorizontal() ? i : 0);
-                if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                    grid[r][c] = p.getId().charAt(0);
-                }
-            }
-        }
-
-        // 3. Tandai posisi pintu keluar dengan 'K' (jika berada dalam board)
-        if (exitPosition != null &&
-                (exitPosition.getRow() < 0 || exitPosition.getRow() >= rows ||
-                        exitPosition.getCol() < 0 || exitPosition.getCol() >= cols)) {
-            // System.out.println(
-            //         "Exit is outside the board at: (" + exitPosition.getRow() + "," + exitPosition.getCol() + ")");
-        }
-
-        // 4. Cetak hasil board
-        for (int r = 0; r < rows; r++) {
-            StringBuilder line = new StringBuilder();
-            for (int c = 0; c < cols; c++) {
-                line.append(colorize(grid[r][c]));
-            }
-            System.out.println(line);
-        }
-
-    }
 
     public boolean isSolved() {
         Piece primary = pieces.get("P");
@@ -133,19 +51,12 @@ public class Board {
         int tailRow = pr;
         int tailCol = pc;
 
-        // System.out.println("col : " + exitCol + " row : " + exitRow);
-        // System.out.println("pc : " + pc + " pr: " + pr);
-
         if (primary.isHorizontal()) {
             tailCol = pc + primary.getLength();
-
-            // Jika exit di kanan
             if (pr == exitRow && tailCol == exitCol) {
                 System.err.println("1");
                 return true;
             }
-
-            // Jika exit di kiri
             if (pr == exitRow && exitCol == pc + 1) {
                 System.err.println("2");
                 return true;
@@ -153,14 +64,10 @@ public class Board {
 
         } else {
             tailRow = pr + primary.getLength();
-
-            // Jika exit di bawah
             if (pc == exitCol && tailRow == exitRow) {
                 System.err.println("3");
                 return true;
             }
-
-            // Jika exit di atas
             if (pc == exitCol && exitRow == pr) {
                 System.err.println("4");
                 return true;
@@ -206,8 +113,6 @@ public class Board {
                 return false;
         }
 
-        // Hanya horizontal pieces bisa bergerak kiri/kanan, vertical pieces bisa ke
-        // atas/bawah
         if ((p.isHorizontal() && (direction.equals("U") || direction.equals("D"))) ||
                 (!p.isHorizontal() && (direction.equals("L") || direction.equals("R")))) {
             return false;
@@ -306,15 +211,6 @@ public class Board {
         return hash;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Board(").append(rows).append("x").append(cols).append("), Exit=").append(exitPosition).append("\n");
-        for (Piece p : pieces.values()) {
-            sb.append(p).append("\n");
-        }
-        return sb.toString();
-    }
 
     public Board deepCopy() {
         Board copy = new Board(this.rows, this.cols, this.countPiece);
@@ -340,6 +236,16 @@ public class Board {
 
     public int getCols() {
         return this.cols;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Board(").append(rows).append("x").append(cols).append("), Exit=").append(exitPosition).append("\n");
+        for (Piece p : pieces.values()) {
+            sb.append(p).append("\n");
+        }
+        return sb.toString();
     }
 
     public void reverseMovement(Movement movement) {
@@ -391,5 +297,81 @@ public class Board {
         }
         return grid;
     }
+    public int getRow() {
+        return this.rows;
+    }
 
+    public int getCol() {
+        return this.cols;
+    }
+
+    public Position getExitPosition() {
+        return exitPosition;
+    }
+
+    public void setExitPosition(Position exitPosition) {
+        this.exitPosition = exitPosition;
+    }
+
+    public Map<String, Piece> getPieces() {
+        return pieces;
+    }
+
+    public void printBoard() {
+        char[][] grid = new char[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            Arrays.fill(grid[r], '.');
+        }
+
+        for (Piece p : pieces.values()) {
+            int pr = p.getRow();
+            int pc = p.getCol();
+            for (int i = 0; i < p.getLength(); i++) {
+                int r = pr + (!p.isHorizontal() ? i : 0);
+                int c = pc + (p.isHorizontal() ? i : 0);
+                if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                    grid[r][c] = p.getId().charAt(0);
+                }
+            }
+        }
+
+        if (exitPosition != null &&
+                (exitPosition.getRow() < 0 || exitPosition.getRow() >= rows ||
+                        exitPosition.getCol() < 0 || exitPosition.getCol() >= cols)) {
+        }
+
+        for (int r = 0; r < rows; r++) {
+            StringBuilder line = new StringBuilder();
+            for (int c = 0; c < cols; c++) {
+                line.append(colorize(grid[r][c]));
+            }
+            System.out.println(line);
+        }
+
+    }
+
+        private static final String[] ANSI_COLORS = { // buat cli
+                "\u001B[31m", // A → merah
+                "\u001B[32m", // B → hijau
+                "\u001B[33m", // C → kuning
+                "\u001B[34m", // D → biru
+                "\u001B[35m", // E → magenta
+                "\u001B[36m", // F → cyan
+                "\u001B[91m", // G → merah terang
+                "\u001B[92m", // H → hijau terang
+                "\u001B[93m", // I → kuning terang
+                "\u001B[94m", // J → biru terang
+                "\u001B[95m", // K → magenta terang (exit bila ingin ditampilkan)
+                "\u001B[96m", // L → cyan terang
+                "\u001B[37m", // M → putih
+        };
+
+    private static String colorize(char ch) {
+        if (ch == '.')
+            return ".";
+        if (ch == 'P')
+            return "\u001B[35mP\u001B[0m"; // primary = ungu
+        int idx = (ch - 'A') % ANSI_COLORS.length;
+        return ANSI_COLORS[idx] + ch + "\u001B[0m";
+    }
 }

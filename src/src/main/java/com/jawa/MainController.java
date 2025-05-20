@@ -25,7 +25,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -420,13 +419,6 @@ public class MainController {
         cell.setId("cell_" + row + "_" + col);
         return cell;
     }
-    // private StackPane createInvisibleCell(int row, int col, double size) {
-    // Rectangle cellBg = new Rectangle(size, size);
-    // cellBg.setFill(Color.web("#1a1158"));
-    // StackPane cell = new StackPane(cellBg);
-    // cell.setId("padding_" + row + "_" + col);
-    // return cell;
-    // }
 
     private double calculateCellSize(int rows, int cols) {
         double availableWidth = boardPane.getWidth();
@@ -500,46 +492,37 @@ public class MainController {
             int pc = primaryPiece.getCol();
 
             int gridRow, gridCol;
-
-            // Berdasarkan logika isSolved()
             if (primaryPiece.isHorizontal()) {
                 int tailCol = pc + primaryPiece.getLength();
 
-                // Kasus 1: Exit di kanan
                 if (pr == exitRow && tailCol == exitCol) {
-                    gridRow = pr + 1; // +1 untuk offset border
-                    gridCol = tailCol + 1; // +1 untuk offset border
+                    gridRow = pr + 1; 
+                    gridCol = tailCol + 1;
                 }
-                // Kasus 2: Exit di kiri
                 else if (pr == exitRow && exitCol <= 1) {
-                    gridRow = pr + 1; //
-                    gridCol = 0; //
+                    gridRow = pr + 1; 
+                    gridCol = 0; 
                 } else {
-                    // Default: tempatkan di kanan
                     gridRow = pr + 1;
                     gridCol = cols + 1;
                 }
             } else {
-                // Primary piece vertikal
                 int tailRow = pr + primaryPiece.getLength();
-
-                // Kasus 3: Exit di bawah
                 if (pc == exitCol && tailRow == exitRow) {
-                    gridRow = tailRow + 1; // +1 untuk offset border
-                    gridCol = pc + 1; // +1 untuk offset border
+                    gridRow = tailRow + 1; 
+                    gridCol = pc + 1; 
                 }
-                // Kasus 4: Exit di atas
+    
                 else if (pc == exitCol && exitRow == 0) {
-                    gridRow = 0; // baris paling atas
-                    gridCol = pc + 1; // +1 untuk offset border
+                    gridRow = 0; 
+                    gridCol = pc + 1; 
                 } else {
-                    // Default: tempatkan di bawah
+                
                     gridRow = rows + 1;
                     gridCol = pc + 1;
                 }
             }
 
-            // Buat kotak merah dengan label K untuk exit gate
             Rectangle exitRect = new Rectangle(cellSize - 4, cellSize - 4);
             exitRect.setFill(Color.RED);
             exitRect.setStroke(Color.BLACK);
@@ -555,7 +538,6 @@ public class MainController {
             exitContainer.getChildren().addAll(exitRect, exitLabel);
             exitContainer.setId("exit_gate");
 
-            // Tambahkan exit ke grid pada posisi yang ditentukan
             boardGrid.add(exitContainer, gridCol, gridRow);
         } catch (Exception e) {
             System.err.println("Error displaying exit gate: " + e.getMessage());
@@ -603,39 +585,6 @@ public class MainController {
         }
     }
 
-    private void updateSinglePiece(String pieceId) {
-        GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
-        Piece piece = board.getPieces().get(pieceId);
-
-        if (piece == null)
-            return;
-
-        StackPane pieceNode = null;
-        for (Node node : boardGrid.getChildren()) {
-            if (node instanceof StackPane &&
-                    node.getId() != null &&
-                    node.getId().equals(pieceId)) {
-                pieceNode = (StackPane) node;
-                break;
-            }
-        }
-
-        if (pieceNode != null) {
-            boardGrid.getChildren().remove(pieceNode);
-
-            Position pos = piece.getPosition();
-            if (piece.isHorizontal()) {
-                GridPane.setColumnSpan(pieceNode, piece.getLength());
-                boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
-            } else {
-                GridPane.setRowSpan(pieceNode, piece.getLength());
-                boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
-            }
-        } else {
-            double cellSize = calculateCellSize(board.getRows(), board.getCols());
-            displaySinglePiece(boardGrid, piece, cellSize);
-        }
-    }
 
     private void showSolutionStep(int stepIndex) {
         List<Movement> solutionSteps = result.getMovements();
@@ -643,7 +592,7 @@ public class MainController {
             return;
         }
 
-        // Selalu rebuild board dari awal sampai stepIndex
+
         board = originalBoard.deepCopy();
         for (int i = 0; i <= stepIndex; i++) {
             Movement move = solutionSteps.get(i);
@@ -667,8 +616,6 @@ public class MainController {
         backButton.setDisable(stepIndex == 0);
         nextButton.setDisable(stepIndex == solutionSteps.size() - 1);
 
-        // statusLabel.setText("Step " + (stepIndex + 1) + " of " +
-        // solutionSteps.size());
     }
 
     @FXML
@@ -683,7 +630,6 @@ public class MainController {
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt"));
 
-        // Set initial filename based on the loaded puzzle file name
         String initialFileName = "solution.txt";
         fileChooser.setInitialFileName(initialFileName);
 
@@ -710,4 +656,38 @@ public class MainController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+    //     private void updateSinglePiece(String pieceId) {
+    //         GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
+    //         Piece piece = board.getPieces().get(pieceId);
+
+    //         if (piece == null)
+    //             return;
+
+    //         StackPane pieceNode = null;
+    //         for (Node node : boardGrid.getChildren()) {
+    //             if (node instanceof StackPane &&
+    //                     node.getId() != null &&
+    //                     node.getId().equals(pieceId)) {
+    //                 pieceNode = (StackPane) node;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (pieceNode != null) {
+    //             boardGrid.getChildren().remove(pieceNode);
+
+    //             Position pos = piece.getPosition();
+    //             if (piece.isHorizontal()) {
+    //                 GridPane.setColumnSpan(pieceNode, piece.getLength());
+    //                 boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
+    //             } else {
+    //                 GridPane.setRowSpan(pieceNode, piece.getLength());
+    //                 boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
+    //             }
+    //         } else {
+    //             double cellSize = calculateCellSize(board.getRows(), board.getCols());
+    //             displaySinglePiece(boardGrid, piece, cellSize);
+    //         }
+    //     }
+
 }

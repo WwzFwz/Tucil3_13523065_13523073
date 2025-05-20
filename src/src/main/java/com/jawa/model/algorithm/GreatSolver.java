@@ -92,7 +92,7 @@ public class GreatSolver implements Solver {
         return null;
     }
 
-    // Child node with board and movement to reach it
+
     private static class ChildNode {
         Board board;
         Movement move;
@@ -103,16 +103,15 @@ public class GreatSolver implements Solver {
         }
     }
 
-    // Generate all possible next board states with moves from current node
+ 
     private List<ChildNode> generateChildren(Node node) {
         List<ChildNode> children = new ArrayList<>();
         Board board = node.board;
 
-        // For each piece, generate possible moves on the board (distance = 1 step)
         for (var piece : board.getPieces().values()) {
-            // Try move piece in all valid directions (depends on orientation)
+         
             for (String dir : piece.isHorizontal() ? new String[] { "L", "R" } : new String[] { "U", "D" }) {
-                Board newBoard = board.deepCopy(); // You need to implement deep copy
+                Board newBoard = board.deepCopy(); 
                 Piece movedPiece = newBoard.getPieces().get(piece.getId());
                 if (canMove(newBoard, movedPiece, dir, 1)) {
                     Movement move = movedPiece.move(dir, 1);
@@ -124,7 +123,6 @@ public class GreatSolver implements Solver {
         return children;
     }
 
-    // Check if piece can move 'distance' in direction on given board
     private boolean canMove(Board board, Piece piece, String direction, int distance) {
         int r = piece.getRow();
         int c = piece.getCol();
