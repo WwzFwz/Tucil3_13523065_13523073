@@ -162,6 +162,10 @@ public class IO {
                 board.addPiece(piece);
             }
 
+            if (board.getPrimaryPiece() == null) {
+                throw new InvalidConfigException("Invalid config : Primary Pieces not found");
+            }
+
             if (board.getPrimaryPiece().isHorizontal()) {
                 if (board.getPrimaryPiece().getRow() != exitPos.getRow()) {
                     throw new InvalidConfigException("Invalid config : Primary Piece and exit not alligned");
@@ -170,6 +174,10 @@ public class IO {
                 if (board.getPrimaryPiece().getCol() != exitPos.getCol()) {
                     throw new InvalidConfigException("Invalid config : Primary Piece and exit not alligned");
                 }
+            }
+
+            if (board.getPieces().size() - 1 != pieceCount) {
+                throw new InvalidConfigException("Invalid config : Pieces count wrong");
             }
 
             return board;

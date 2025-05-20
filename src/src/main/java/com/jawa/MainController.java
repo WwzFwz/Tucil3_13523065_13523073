@@ -249,17 +249,21 @@ public class MainController {
         try {
             board = IO.loadFromFile(selectedFile);
             stepsListView.getItems().clear();
+            statusLabel.setText("Success load puzzle...");
 
         } catch (InvalidConfigException e) {
             board = null;
             fileNameLabel.setText(e.getMessage());
             boardPane.getChildren().clear();
+            statusLabel.setText("Load Fail...");
         } catch (Exception e) {
             board = null;
             fileNameLabel.setText("Error Occured : " + e.getMessage());
             boardPane.getChildren().clear();
+            statusLabel.setText("Load Fail...");
+
         }
-        statusLabel.setText("Success load puzzle...");
+
         initializeBoard(board.getRow(), board.getCol());
         originalBoard = board.deepCopy();
 
@@ -273,7 +277,8 @@ public class MainController {
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
         String algorithm = algorithmComboBox.getValue();
-        if( algorithm != null && algorithm == ("Uniform-Cost Search")) solveButton.setDisable(false);
+        if (algorithm != null && algorithm == ("Uniform-Cost Search"))
+            solveButton.setDisable(false);
     }
 
     @FXML
