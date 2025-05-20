@@ -22,7 +22,7 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 
 ## Cara Menjalankan Program 1 (Jika menggunakan extension vs code)
 1. Pastikan sucah mendownload requirement opsional
-2. Buka src/src/main/java/com/App.java
+2. Buka src/src/main/java/com/jawa/App.java
 3. Tekan Run pada method main
 
 
