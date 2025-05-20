@@ -115,10 +115,21 @@ public class IO {
                         exitPos = new Position(exitRow, exitCol);
                         System.out.println(exitRow + " " + exitCol);
                     } else if (c == 0) {
-                        offsetX = 1;
+                        // offsetX = 1;
+                        // offsetY = 0;
+                        // int exitRow = r;
+                        // int exitCol = 1;
+                        // exitPos = new Position(exitRow, exitCol);
+                        int exitCol = 1;
+                        if (declaredCols + 1 <= currentLine.length()) {
+                            offsetX = 1;
+                            exitCol = 0;
+                        } else {
+                            offsetX = 0;
+                            exitCol = c;
+                        }
                         offsetY = 0;
                         int exitRow = r;
-                        int exitCol = 1;
                         exitPos = new Position(exitRow, exitCol);
                         System.out.println(exitRow + " " + exitCol);
                     } else {
