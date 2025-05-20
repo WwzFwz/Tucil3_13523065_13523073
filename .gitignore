@@ -1,8 +1,8 @@
 # Maven
-target/
-.classpath
-.project
-.settings/
+# target/
+# .classpath
+# .project
+# .settings/
 
 # IDE
 .idea/
