@@ -50,14 +50,14 @@ java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules j
 ```
 
 Note :   
-- "C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diinstal (path yg saya mont auntuk dicopy sblmnya)
+- "C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diextract (path yg saya minta auntuk dicopy sblmnya)
 - "target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
 
 
 ## Struktur File
 ```
 Tuci3_13523065_13523073
-├── bin/
+├
 ├── doc/
 ├── src/
 │     ├── src/main/
