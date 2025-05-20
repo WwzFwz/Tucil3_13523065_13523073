@@ -332,22 +332,11 @@ public class MainController {
             playPauseButton.setDisable(false);
 
             updateStepsListView(0);
-            statusLabel.setText("Solution found: " + result.getMovements().size() +
+            statusLabel.setText("Solution found: " + "Node : "   + result.getNodesExpanded()+
                     " steps in " + result.getSolvingTime() + "ms");
             // munculin board saat ini
             displayBoard(board);
-            Timeline timeline = new Timeline();
-            int n = result.getMovements().size();
-
-            for (int i = 0; i < n; i++) {
-                int step = i;
-                KeyFrame keyFrame = new KeyFrame(Duration.seconds(i), event -> {
-                    showSolutionStep(step);
-                });
-                timeline.getKeyFrames().add(keyFrame);
-            }
-
-            timeline.play();
+            // startPlayback();
         } catch (Exception e) {
             // e.printStackTrace();
             statusLabel.setText("Error: " + e.getMessage());
@@ -407,7 +396,7 @@ public class MainController {
                     }
 
                     if (currentStepIndex < movements.size() - 1) {
-                        currentStepIndex++; // ✅ Increment sebelum dipakai
+                        currentStepIndex++; 
                         showSolutionStep(currentStepIndex);
                     } else {
                         playbackTimeline.stop();
@@ -419,7 +408,7 @@ public class MainController {
         playbackTimeline.setCycleCount(Timeline.INDEFINITE);
         playbackTimeline.play();
         isPlaying = true;
-        playPauseButton.setText("⏸"); // Opsional: ubah ke "pause" saat mulai
+        playPauseButton.setText("⏸"); 
     }
 
     private StackPane createCell(int row, int col, double size) {

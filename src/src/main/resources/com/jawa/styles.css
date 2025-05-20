@@ -44,6 +44,17 @@ Label {
     -fx-text-fill: #c0c0c0; /* Light gray untuk readability */
 }
 
+
+/* Add this to your CSS file */
+#statusLabel {
+    -fx-text-fill: #4caf50; /* Brighter green for better visibility */
+    -fx-font-size: 14px; /* Slightly larger text */
+    -fx-padding: 5px;
+    -fx-background-color: rgba(26, 17, 88, 0.7); /* Semi-transparent background */
+    -fx-background-radius: 3px;
+}
+
+
 /* Button style */
 .button {
     -fx-background-color: -fx-primary;
