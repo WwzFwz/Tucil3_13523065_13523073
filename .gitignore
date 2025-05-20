@@ -1,9 +1,10 @@
 # Maven
-target/
-.classpath
-.project
-.settings/
+# target/
+# .classpath
+# .project
+# .settings/
 
+target/maven-status/
 # IDE
 .idea/
 *.iml
