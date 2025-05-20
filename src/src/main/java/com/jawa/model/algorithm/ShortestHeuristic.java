@@ -15,7 +15,7 @@ public class ShortestHeuristic implements Heuristic {
 
         int r = primary.getRow();
         int c = primary.getCol();
-        System.out.println("prim row " + r + " prim col " + c);
+        // System.out.println("prim row " + r + " prim col " + c);
         if (primary.isHorizontal()) {
             int frontCol = c + primary.getLength() - 1;
 

@@ -106,8 +106,8 @@ public class Board {
         if (exitPosition != null &&
                 (exitPosition.getRow() < 0 || exitPosition.getRow() >= rows ||
                         exitPosition.getCol() < 0 || exitPosition.getCol() >= cols)) {
-            System.out.println(
-                    "Exit is outside the board at: (" + exitPosition.getRow() + "," + exitPosition.getCol() + ")");
+            // System.out.println(
+            //         "Exit is outside the board at: (" + exitPosition.getRow() + "," + exitPosition.getCol() + ")");
         }
 
         // 4. Cetak hasil board
@@ -133,8 +133,8 @@ public class Board {
         int tailRow = pr;
         int tailCol = pc;
 
-        System.out.println("col : " + exitCol + " row : " + exitRow);
-        System.out.println("pc : " + pc + " pr: " + pr);
+        // System.out.println("col : " + exitCol + " row : " + exitRow);
+        // System.out.println("pc : " + pc + " pr: " + pr);
 
         if (primary.isHorizontal()) {
             tailCol = pc + primary.getLength();
