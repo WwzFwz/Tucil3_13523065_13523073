@@ -138,13 +138,12 @@ public class MainController {
         boardGrid.setPadding(new Insets(10));
         double cellSize = calculateCellSize(rows, cols);
 
-        for (int row = 1; row < rows+1; row++) {
-            for (int col = 1; col < cols+1; col++) {
+        for (int row = 1; row < rows + 1; row++) {
+            for (int col = 1; col < cols + 1; col++) {
                 StackPane cell = createCell(row, col, cellSize);
                 boardGrid.add(cell, col, row);
             }
         }
-
 
         boardPane.getChildren().add(boardGrid);
 
@@ -257,7 +256,8 @@ public class MainController {
         originalBoard = board.deepCopy();
 
         displayBoard(board);
-        if(board!=null) displayExitGate(board.getExitPosition(), board.getCols(), board.getRows());
+        if (board != null)
+            displayExitGate(board.getExitPosition(), board.getCols(), board.getRows());
 
         fileUploaded = true;
         fileNameLabel.setText("File: " + selectedFile.getName());
@@ -266,6 +266,7 @@ public class MainController {
         updateHeuristicOptions(algorithmComboBox.getValue());
         solveButton.setDisable(true);
     }
+
     @FXML
     private void handleSolve() {
 
@@ -331,7 +332,7 @@ public class MainController {
             playPauseButton.setDisable(false);
 
             updateStepsListView(0);
-            statusLabel.setText( result.getNodesExpanded()+ " Nodes explored" + 
+            statusLabel.setText(result.getNodesExpanded() + " Nodes explored" +
                     " in " + result.getSolvingTime() + "ms");
 
             displayBoard(board);
@@ -395,7 +396,7 @@ public class MainController {
                     }
 
                     if (currentStepIndex < movements.size() - 1) {
-                        currentStepIndex++; 
+                        currentStepIndex++;
                         showSolutionStep(currentStepIndex);
                     } else {
                         playbackTimeline.stop();
@@ -407,7 +408,7 @@ public class MainController {
         playbackTimeline.setCycleCount(Timeline.INDEFINITE);
         playbackTimeline.play();
         isPlaying = true;
-        playPauseButton.setText("⏸"); 
+        playPauseButton.setText("⏸");
     }
 
     private StackPane createCell(int row, int col, double size) {
@@ -420,11 +421,11 @@ public class MainController {
         return cell;
     }
     // private StackPane createInvisibleCell(int row, int col, double size) {
-    //     Rectangle cellBg = new Rectangle(size, size);
-    //     cellBg.setFill(Color.web("#1a1158"));
-    //     StackPane cell = new StackPane(cellBg);
-    //     cell.setId("padding_" + row + "_" + col);
-    //     return cell;
+    // Rectangle cellBg = new Rectangle(size, size);
+    // cellBg.setFill(Color.web("#1a1158"));
+    // StackPane cell = new StackPane(cellBg);
+    // cell.setId("padding_" + row + "_" + col);
+    // return cell;
     // }
 
     private double calculateCellSize(int rows, int cols) {
@@ -464,6 +465,8 @@ public class MainController {
         for (Piece piece : pieces.values()) {
             displaySinglePiece(boardGrid, piece, cellSize);
         }
+        displayExitGate(board.getExitPosition(), board.getCols(), board.getRows());
+
     }
 
     private void clearPieces(GridPane boardGrid) {
@@ -471,97 +474,94 @@ public class MainController {
                 !((StackPane) node).getId().startsWith("cell_"));
     }
 
-
     private void displayExitGate(Position exitPos, int rows, int cols) {
-    try {
-        if (exitPos == null) return;
-        
-        if (boardPane.getChildren().isEmpty()) {
-            System.err.println("Warning: boardPane is empty. Cannot display exit gate.");
-            return;
-        }
-        
-        GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
-        
-        double cellSize = calculateCellSize(rows, cols);
-        
-        Piece primaryPiece = board.getPieces().get("P");
-        if (primaryPiece == null) {
-            System.err.println("Warning: Primary piece 'P' not found. Cannot determine exit gate position.");
-            return;
-        }
-        
-        int exitRow = exitPos.getRow();
-        int exitCol = exitPos.getCol();
-        int pr = primaryPiece.getRow();
-        int pc = primaryPiece.getCol();
-        
-        int gridRow, gridCol;
-        
-        // Berdasarkan logika isSolved()
-        if (primaryPiece.isHorizontal()) {
-            int tailCol = pc + primaryPiece.getLength();
-            
-            // Kasus 1: Exit di kanan
-            if (pr == exitRow && tailCol == exitCol) {
-                gridRow = pr + 1; // +1 untuk offset border
-                gridCol = tailCol + 1; // +1 untuk offset border
-            }
-            // Kasus 2: Exit di kiri
-            else if (pr == exitRow && exitCol == pc - 1) {
-                gridRow = pr + 1; // 
-                gridCol = 0; //
-            }
-            else {
-                // Default: tempatkan di kanan
-                gridRow = pr + 1;
-                gridCol = cols + 1;
-            }
-        } else {
-            // Primary piece vertikal
-            int tailRow = pr + primaryPiece.getLength();
-            
-            // Kasus 3: Exit di bawah
-            if (pc == exitCol && tailRow == exitRow) {
-                gridRow = tailRow + 1; // +1 untuk offset border
-                gridCol = pc + 1; // +1 untuk offset border
-            }
-            // Kasus 4: Exit di atas
-            else if (pc == exitCol && exitRow == pr - 1) {
-                gridRow = 0; // baris paling atas
-                gridCol = pc + 1; // +1 untuk offset border
-            }
-            else {
-                // Default: tempatkan di bawah
-                gridRow = rows + 1;
-                gridCol = pc + 1;
-            }
-        }
-        
-        // Buat kotak merah dengan label K untuk exit gate
-        Rectangle exitRect = new Rectangle(cellSize - 4, cellSize - 4);
-        exitRect.setFill(Color.RED);
-        exitRect.setStroke(Color.BLACK);
-        exitRect.setStrokeWidth(2);
-        exitRect.setArcWidth(10);
-        exitRect.setArcHeight(10);
-        
-        Label exitLabel = new Label("K");
-        exitLabel.setTextFill(Color.WHITE);
-        exitLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        
-        StackPane exitContainer = new StackPane();
-        exitContainer.getChildren().addAll(exitRect, exitLabel);
-        exitContainer.setId("exit_gate");
-        
-        // Tambahkan exit ke grid pada posisi yang ditentukan
-        boardGrid.add(exitContainer, gridCol, gridRow);
-    } catch (Exception e) {
-        System.err.println("Error displaying exit gate: " + e.getMessage());
-        e.printStackTrace();
-    }
-}
+        try {
+            if (exitPos == null)
+                return;
 
+            if (boardPane.getChildren().isEmpty()) {
+                System.err.println("Warning: boardPane is empty. Cannot display exit gate.");
+                return;
+            }
+
+            GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
+
+            double cellSize = calculateCellSize(rows, cols);
+
+            Piece primaryPiece = board.getPieces().get("P");
+            if (primaryPiece == null) {
+                System.err.println("Warning: Primary piece 'P' not found. Cannot determine exit gate position.");
+                return;
+            }
+
+            int exitRow = exitPos.getRow();
+            int exitCol = exitPos.getCol();
+            int pr = primaryPiece.getRow();
+            int pc = primaryPiece.getCol();
+
+            int gridRow, gridCol;
+
+            // Berdasarkan logika isSolved()
+            if (primaryPiece.isHorizontal()) {
+                int tailCol = pc + primaryPiece.getLength();
+
+                // Kasus 1: Exit di kanan
+                if (pr == exitRow && tailCol == exitCol) {
+                    gridRow = pr + 1; // +1 untuk offset border
+                    gridCol = tailCol + 1; // +1 untuk offset border
+                }
+                // Kasus 2: Exit di kiri
+                else if (pr == exitRow && exitCol <= 1) {
+                    gridRow = pr + 1; //
+                    gridCol = 0; //
+                } else {
+                    // Default: tempatkan di kanan
+                    gridRow = pr + 1;
+                    gridCol = cols + 1;
+                }
+            } else {
+                // Primary piece vertikal
+                int tailRow = pr + primaryPiece.getLength();
+
+                // Kasus 3: Exit di bawah
+                if (pc == exitCol && tailRow == exitRow) {
+                    gridRow = tailRow + 1; // +1 untuk offset border
+                    gridCol = pc + 1; // +1 untuk offset border
+                }
+                // Kasus 4: Exit di atas
+                else if (pc == exitCol && exitRow == 0) {
+                    gridRow = 0; // baris paling atas
+                    gridCol = pc + 1; // +1 untuk offset border
+                } else {
+                    // Default: tempatkan di bawah
+                    gridRow = rows + 1;
+                    gridCol = pc + 1;
+                }
+            }
+
+            // Buat kotak merah dengan label K untuk exit gate
+            Rectangle exitRect = new Rectangle(cellSize - 4, cellSize - 4);
+            exitRect.setFill(Color.RED);
+            exitRect.setStroke(Color.BLACK);
+            exitRect.setStrokeWidth(2);
+            exitRect.setArcWidth(10);
+            exitRect.setArcHeight(10);
+
+            Label exitLabel = new Label("EXIT");
+            exitLabel.setTextFill(Color.BLACK);
+            exitLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+
+            StackPane exitContainer = new StackPane();
+            exitContainer.getChildren().addAll(exitRect, exitLabel);
+            exitContainer.setId("exit_gate");
+
+            // Tambahkan exit ke grid pada posisi yang ditentukan
+            boardGrid.add(exitContainer, gridCol, gridRow);
+        } catch (Exception e) {
+            System.err.println("Error displaying exit gate: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     private void displaySinglePiece(GridPane boardGrid, Piece piece, double cellSize) {
         Rectangle pieceRect = new Rectangle();
@@ -587,7 +587,7 @@ public class MainController {
         pieceContainer.getChildren().add(pieceRect);
 
         Label idLabel = new Label(piece.getId());
-        idLabel.setTextFill(Color.WHITE);
+        idLabel.setTextFill(Color.BLACK);
         idLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         pieceContainer.getChildren().add(idLabel);
 
@@ -596,14 +596,13 @@ public class MainController {
         Position pos = piece.getPosition();
         if (piece.isHorizontal()) {
             GridPane.setColumnSpan(pieceContainer, piece.getLength());
-            boardGrid.add(pieceContainer, pos.getCol()+1, pos.getRow()+1);
+            boardGrid.add(pieceContainer, pos.getCol() + 1, pos.getRow() + 1);
         } else {
             GridPane.setRowSpan(pieceContainer, piece.getLength());
-            boardGrid.add(pieceContainer, pos.getCol()+1, pos.getRow()+1);
+            boardGrid.add(pieceContainer, pos.getCol() + 1, pos.getRow() + 1);
         }
     }
 
-    
     private void updateSinglePiece(String pieceId) {
         GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
         Piece piece = board.getPieces().get(pieceId);
@@ -668,45 +667,47 @@ public class MainController {
         backButton.setDisable(stepIndex == 0);
         nextButton.setDisable(stepIndex == solutionSteps.size() - 1);
 
-        // statusLabel.setText("Step " + (stepIndex + 1) + " of " + solutionSteps.size());
+        // statusLabel.setText("Step " + (stepIndex + 1) + " of " +
+        // solutionSteps.size());
     }
+
     @FXML
     private void handleSaveSolution() {
         if (result == null) {
             showAlert(Alert.AlertType.ERROR, "Error", "No solution available to save.");
             return;
         }
-        
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Solution");
         fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("Text Files", "*.txt")
-        );
-        
+                new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
         // Set initial filename based on the loaded puzzle file name
         String initialFileName = "solution.txt";
         fileChooser.setInitialFileName(initialFileName);
-        
+
         File file = fileChooser.showSaveDialog(saveButton.getScene().getWindow());
         if (file != null) {
             try {
                 IO.saveResultToFile(originalBoard, result, file);
-                
-                showAlert(Alert.AlertType.INFORMATION, "Success", 
-                    "Solution saved successfully to: " + file.getAbsolutePath());
+
+                showAlert(Alert.AlertType.INFORMATION, "Success",
+                        "Solution saved successfully to: " + file.getAbsolutePath());
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error", 
-                    "Failed to save solution: " + e.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Error",
+                        "Failed to save solution: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
-// Add a helper method for showing alerts
-private void showAlert(Alert.AlertType type, String title, String content) {
-    Alert alert = new Alert(type);
-    alert.setTitle(title);
-    alert.setHeaderText(null);
-    alert.setContentText(content);
-    alert.showAndWait();
-}
+
+    // Add a helper method for showing alerts
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }
