@@ -54,6 +54,16 @@ Note :
 - "target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
 
 
+
+## Cara Menjalankan Program 4 (lewat bin)
+1. Pastikan sudah mendownload requirement wajib
+
+2. Jalankan executable file
+```
+java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules javafx.controls,javafx.fxml -cp bin/target/classes com.jawa.App
+```
+
+
 ## Struktur File
 ```
 Tuci3_13523065_13523073
