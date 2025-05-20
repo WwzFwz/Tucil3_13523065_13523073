@@ -272,7 +272,8 @@ public class MainController {
         algorithmComboBox.setDisable(false);
         algorithmComboBox.setPromptText("Select Algorithm");
         updateHeuristicOptions(algorithmComboBox.getValue());
-        solveButton.setDisable(true);
+        String algorithm = algorithmComboBox.getValue();
+        if( algorithm != null && algorithm == ("Uniform-Cost Search")) solveButton.setDisable(false);
     }
 
     @FXML
