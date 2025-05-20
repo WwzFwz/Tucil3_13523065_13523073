@@ -2,8 +2,8 @@ package com.jawa.model.gameComponent;
 
 public class Movement {
     private String pieceId;
-    private String direction; // "R", "L", "U", "D"
-    private int distance; // pindah brp langkah
+    private String direction;
+    private int distance;
 
     public Movement(String pieceId, String direction, int distance) {
         this.pieceId = pieceId;
@@ -34,18 +34,28 @@ public class Movement {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+
     @Override
     public String toString() {
         String directionText = "";
         switch (direction) {
-            case "R": directionText = "Right"; break;
-            case "L": directionText = "Left"; break;
-            case "U": directionText = "Up"; break;
-            case "D": directionText = "Down"; break;
-            default: directionText = direction;
+            case "R":
+                directionText = "Right";
+                break;
+            case "L":
+                directionText = "Left";
+                break;
+            case "U":
+                directionText = "Up";
+                break;
+            case "D":
+                directionText = "Down";
+                break;
+            default:
+                directionText = direction;
         }
-        
-        return "Piece " + pieceId + " moves " + directionText + " " + distance + 
-            (distance > 1 ? " steps" : " step");
+
+        return "Piece " + pieceId + " moves " + directionText + " " + distance +
+                (distance > 1 ? " steps" : " step");
     }
 }

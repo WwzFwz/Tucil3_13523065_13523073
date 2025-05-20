@@ -6,20 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.jawa.model.algorithm.AStarSolver;
-import com.jawa.model.algorithm.BlockingHeuristic;
-import com.jawa.model.algorithm.GreatSolver;
-import com.jawa.model.algorithm.GreedySolver;
-import com.jawa.model.algorithm.Heuristic;
-import com.jawa.model.algorithm.ShortestHeuristic;
+import com.jawa.model.algorithm.GBFSSolver;
 import com.jawa.model.algorithm.Solver;
-import com.jawa.model.algorithm.UCLSolver;
-import com.jawa.model.algorithm.ZeroHeuristic;
+import com.jawa.model.algorithm.UCSSolver;
+
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Movement;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 import com.jawa.model.gameState.IO;
 import com.jawa.model.gameState.Result;
+import com.jawa.model.gameState.IO.InvalidConfigException;
+import com.jawa.model.heuristic.BlockingHeuristic;
+import com.jawa.model.heuristic.Heuristic;
+import com.jawa.model.heuristic.ShortestHeuristic;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -248,9 +248,18 @@ public class MainController {
         selectedFile = fileChooser.showOpenDialog(uploadButton.getScene().getWindow());
         try {
             board = IO.loadFromFile(selectedFile);
+            stepsListView.getItems().clear();
+
+        } catch (InvalidConfigException e) {
+            board = null;
+            fileNameLabel.setText(e.getMessage());
+            boardPane.getChildren().clear();
         } catch (Exception e) {
+            board = null;
             fileNameLabel.setText("Error Occured : " + e.getMessage());
+            boardPane.getChildren().clear();
         }
+        statusLabel.setText("Success load puzzle...");
         initializeBoard(board.getRow(), board.getCol());
         originalBoard = board.deepCopy();
 
@@ -288,29 +297,29 @@ public class MainController {
                     selectedHeuristic = new BlockingHeuristic();
                     break;
                 default:
-                    selectedHeuristic = new ZeroHeuristic();
+                    selectedHeuristic = new BlockingHeuristic();
             }
         } else {
 
-            selectedHeuristic = new ZeroHeuristic();
+            selectedHeuristic = new BlockingHeuristic();
         }
 
         Solver solver;
         if (algorithm == null) {
-            solver = new GreatSolver(selectedHeuristic);
+            solver = new UCSSolver();
         } else {
             switch (algorithm) {
                 case "A*":
                     solver = new AStarSolver(selectedHeuristic);
                     break;
                 case "Greedy Best-First":
-                    solver = new GreedySolver(selectedHeuristic);
+                    solver = new GBFSSolver(selectedHeuristic);
                     break;
                 case "Uniform-Cost Search":
-                    solver = new UCLSolver();
+                    solver = new UCSSolver();
                     break;
                 default:
-                    solver = new GreatSolver(selectedHeuristic);
+                    solver = new UCSSolver();
             }
         }
 
@@ -332,12 +341,12 @@ public class MainController {
 
             updateStepsListView(0);
             statusLabel.setText(result.getNodesExpanded() + " Nodes explored" +
-                    " in " + result.getSolvingTime() + "ms");
+                    " in " + result.getSolvingTime() + "ms | " + result.getMovements().size() + " step");
 
             displayBoard(board);
             solveButton.setDisable(true);
         } catch (Exception e) {
-            // e.printStackTrace();
+
             statusLabel.setText("Error: " + e.getMessage());
         }
     }
@@ -496,12 +505,11 @@ public class MainController {
                 int tailCol = pc + primaryPiece.getLength();
 
                 if (pr == exitRow && tailCol == exitCol) {
-                    gridRow = pr + 1; 
+                    gridRow = pr + 1;
                     gridCol = tailCol + 1;
-                }
-                else if (pr == exitRow && exitCol <= 1) {
-                    gridRow = pr + 1; 
-                    gridCol = 0; 
+                } else if (pr == exitRow && exitCol <= 1) {
+                    gridRow = pr + 1;
+                    gridCol = 0;
                 } else {
                     gridRow = pr + 1;
                     gridCol = cols + 1;
@@ -509,15 +517,15 @@ public class MainController {
             } else {
                 int tailRow = pr + primaryPiece.getLength();
                 if (pc == exitCol && tailRow == exitRow) {
-                    gridRow = tailRow + 1; 
-                    gridCol = pc + 1; 
+                    gridRow = tailRow + 1;
+                    gridCol = pc + 1;
                 }
-    
+
                 else if (pc == exitCol && exitRow == 0) {
-                    gridRow = 0; 
-                    gridCol = pc + 1; 
+                    gridRow = 0;
+                    gridCol = pc + 1;
                 } else {
-                
+
                     gridRow = rows + 1;
                     gridCol = pc + 1;
                 }
@@ -585,13 +593,11 @@ public class MainController {
         }
     }
 
-
     private void showSolutionStep(int stepIndex) {
         List<Movement> solutionSteps = result.getMovements();
         if (solutionSteps == null || stepIndex < 0 || stepIndex >= solutionSteps.size()) {
             return;
         }
-
 
         board = originalBoard.deepCopy();
         for (int i = 0; i <= stepIndex; i++) {
@@ -648,7 +654,6 @@ public class MainController {
         }
     }
 
-    // Add a helper method for showing alerts
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -656,38 +661,5 @@ public class MainController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-    //     private void updateSinglePiece(String pieceId) {
-    //         GridPane boardGrid = (GridPane) boardPane.getChildren().get(0);
-    //         Piece piece = board.getPieces().get(pieceId);
-
-    //         if (piece == null)
-    //             return;
-
-    //         StackPane pieceNode = null;
-    //         for (Node node : boardGrid.getChildren()) {
-    //             if (node instanceof StackPane &&
-    //                     node.getId() != null &&
-    //                     node.getId().equals(pieceId)) {
-    //                 pieceNode = (StackPane) node;
-    //                 break;
-    //             }
-    //         }
-
-    //         if (pieceNode != null) {
-    //             boardGrid.getChildren().remove(pieceNode);
-
-    //             Position pos = piece.getPosition();
-    //             if (piece.isHorizontal()) {
-    //                 GridPane.setColumnSpan(pieceNode, piece.getLength());
-    //                 boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
-    //             } else {
-    //                 GridPane.setRowSpan(pieceNode, piece.getLength());
-    //                 boardGrid.add(pieceNode, pos.getCol(), pos.getRow());
-    //             }
-    //         } else {
-    //             double cellSize = calculateCellSize(board.getRows(), board.getCols());
-    //             displaySinglePiece(boardGrid, piece, cellSize);
-    //         }
-    //     }
 
 }

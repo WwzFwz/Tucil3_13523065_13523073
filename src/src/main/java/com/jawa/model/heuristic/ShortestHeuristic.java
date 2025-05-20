@@ -1,10 +1,12 @@
-package com.jawa.model.algorithm;
+package com.jawa.model.heuristic;
 
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 
-public class ShortestHeuristic implements Heuristic {
+public class ShortestHeuristic extends Heuristic {
+    public ShortestHeuristic() {
+    }
 
     @Override
     public int estimate(Board board) {
@@ -28,12 +30,11 @@ public class ShortestHeuristic implements Heuristic {
             if (c == exit.getCol() && exit.getRow() > frontRow)
                 return exit.getRow() - frontRow - 1;
 
-        
             if (c == exit.getCol() && exit.getRow() < r)
                 return r - exit.getRow() - 1;
         }
 
-        return Integer.MAX_VALUE; 
+        return Integer.MAX_VALUE;
     }
 
 }

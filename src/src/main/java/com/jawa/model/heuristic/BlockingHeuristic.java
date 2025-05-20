@@ -1,4 +1,4 @@
-package com.jawa.model.algorithm;
+package com.jawa.model.heuristic;
 
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Piece;
@@ -9,7 +9,10 @@ import java.util.Set;
 import java.util.Map;
 import java.util.Set;
 
-public class BlockingHeuristic implements Heuristic {
+public class BlockingHeuristic extends Heuristic {
+    public BlockingHeuristic() {
+    }
+
     @Override
     public int estimate(Board board) {
         Piece primary = board.getPrimaryPiece();

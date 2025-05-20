@@ -13,10 +13,10 @@ import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameState.Result;
 import com.jawa.model.heuristic.Heuristic;
 
-public class AStarSolver extends Solver {
+public class GBFSSolver extends Solver {
     private Heuristic heuristic;
 
-    public AStarSolver(Heuristic heuristic) {
+    public GBFSSolver(Heuristic heuristic) {
         this.heuristic = heuristic;
     }
 
@@ -24,13 +24,12 @@ public class AStarSolver extends Solver {
     public Result solve(Board initial) {
         long startTime = System.currentTimeMillis();
 
-        PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingInt(n -> n.f));
+        PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingInt(n -> n.h));
         Set<String> closed = new HashSet<>();
         int nodesExpanded = 0;
 
-        List<Movement> initialPath = new ArrayList<>();
         int h = heuristic.estimate(initial);
-        Node startNode = new Node(initial, initialPath, 0, h);
+        Node startNode = new Node(initial, new ArrayList<>(), h, true);
         open.add(startNode);
 
         while (!open.isEmpty()) {
@@ -55,15 +54,10 @@ public class AStarSolver extends Solver {
                 if (closed.contains(child.board.toString()))
                     continue;
 
-                int gNew = current.g + 1;
                 int hNew = heuristic.estimate(child.board);
-                int fNew = gNew + hNew;
-
                 List<Movement> newPath = new ArrayList<>(current.path);
                 newPath.add(child.move);
-
-                Node newNode = new Node(child.board, newPath, gNew, fNew);
-                open.add(newNode);
+                open.add(new Node(child.board, newPath, hNew, true));
             }
         }
 
