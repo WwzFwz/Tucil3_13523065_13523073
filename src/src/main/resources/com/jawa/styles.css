@@ -11,7 +11,7 @@
     -fx-background-color: -fx-background;
 }
 
-/* Panel kontrol */
+
 .control-panel {
     -fx-background-color: #0d0545; 
     -fx-padding: 10;
@@ -23,7 +23,7 @@
     -fx-border-width: 0 1 0 0; 
 }
 
-/* Judul panel */
+
 .title-label {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
@@ -37,25 +37,23 @@
     -fx-text-fill: #ffffff; 
 }
 
-/* Label standar */
+
 Label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #c0c0c0; /* Light gray untuk readability */
+    -fx-text-fill: #c0c0c0; 
 }
 
 
-/* Add this to your CSS file */
 #statusLabel {
-    -fx-text-fill: #4caf50; /* Brighter green for better visibility */
-    -fx-font-size: 14px; /* Slightly larger text */
+    -fx-text-fill: #4caf50; 
+    -fx-font-size: 14px; 
     -fx-padding: 5px;
-    -fx-background-color: rgba(26, 17, 88, 0.7); /* Semi-transparent background */
+    -fx-background-color: rgba(26, 17, 88, 0.7); 
     -fx-background-radius: 3px;
 }
 
 
-/* Button style */
 .button {
     -fx-background-color: -fx-primary;
     -fx-text-fill: -fx-primarytext;
@@ -77,7 +75,7 @@ Label {
     -fx-background-color: #7c4dff; 
 }
 
-/* ComboBox style */
+
 .combo-box {
     -fx-background-color: #1a1158; 
     -fx-border-color: -fx-primary;
@@ -94,7 +92,7 @@ Label {
     -fx-background-color: -fx-primary;
 }
 
-/* Center the prompt text */
+
 .combo-box:showing-prompt > .list-cell {
     -fx-alignment: CENTER;
     -fx-text-fill: #8f8f8f;     

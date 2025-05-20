@@ -1,6 +1,11 @@
 package com.jawa.model.algorithm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 import com.jawa.model.gameComponent.Board;
 import com.jawa.model.gameComponent.Movement;
@@ -94,7 +99,7 @@ public class GreedySolver implements Solver {
                         Movement move = movedPiece.move(dir, distance);
                         children.add(new ChildNode(newBoard, move));
                     } else {
-                        // begitu ketemu satu langkah yang tidak valid, tidak perlu coba lebih jauh
+                        
                         break;
                     }
                 }

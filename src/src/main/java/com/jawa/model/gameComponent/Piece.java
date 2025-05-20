@@ -38,6 +38,32 @@ public class Piece {
         this.isPrimary = other.isPrimary;
     }
 
+    public Movement move(String direction, int distance) {
+        switch (direction) {
+            case "R":
+                if (isHorizontal) {
+                    setCol(getCol() + distance);
+                }
+                break;
+            case "L":
+                if (isHorizontal) {
+                    setCol(getCol() - distance);
+                }
+                break;
+            case "U":
+                if (!isHorizontal) {
+                    setRow(getRow() - distance);
+                }
+                break;
+            case "D":
+                if (!isHorizontal) {
+                    setRow(getRow() + distance);
+                }
+                break;
+        }
+        return new Movement(getId(), direction, distance);
+    }
+
     public String getId() {
         return id;
     }
@@ -77,36 +103,7 @@ public class Piece {
         return isPrimary;
     }
 
-    /**
-     * Mengembalikan Movement object setelah memindahkan piece
-     * (tanpa validasi posisi, lakukan validasi di Board)
-     */
-    public Movement move(String direction, int distance) {
-        switch (direction) {
-            case "R":
-                if (isHorizontal) {
-                    setCol(getCol() + distance);
-                }
-                break;
-            case "L":
-                if (isHorizontal) {
-                    setCol(getCol() - distance);
-                }
-                break;
-            case "U":
-                if (!isHorizontal) {
-                    setRow(getRow() - distance);
-                }
-                break;
-            case "D":
-                if (!isHorizontal) {
-                    setRow(getRow() + distance);
-                }
-                break;
-        }
-        return new Movement(getId(), direction, distance);
-    }
-
+    
     @Override
     public String toString() {
         return id + " at (" + getRow() + "," + getCol() + "), length=" + length +
