@@ -11,10 +11,8 @@ public class Board {
     private int rows;
     private int cols;
     private int countPiece;
-    private Map<String, Piece> pieces; 
+    private Map<String, Piece> pieces;
     private Position exitPosition;
-
-
 
     public Board(int rows, int cols, int countPiece) {
         this.rows = rows;
@@ -37,7 +35,6 @@ public class Board {
     public void addPiece(Piece p) {
         pieces.put(p.getId(), p);
     }
-
 
     public boolean isSolved() {
         Piece primary = pieces.get("P");
@@ -133,7 +130,7 @@ public class Board {
             } else if (direction.equals("U")) {
                 checkRow = startRow - step;
                 checkCol = startCol;
-            } else { // D
+            } else {
                 checkRow = startRow + p.getLength() - 1 + step;
                 checkCol = startCol;
             }
@@ -210,7 +207,6 @@ public class Board {
         }
         return hash;
     }
-
 
     public Board deepCopy() {
         Board copy = new Board(this.rows, this.cols, this.countPiece);
@@ -297,6 +293,7 @@ public class Board {
         }
         return grid;
     }
+
     public int getRow() {
         return this.rows;
     }
@@ -350,27 +347,27 @@ public class Board {
 
     }
 
-        private static final String[] ANSI_COLORS = { // buat cli
-                "\u001B[31m", // A → merah
-                "\u001B[32m", // B → hijau
-                "\u001B[33m", // C → kuning
-                "\u001B[34m", // D → biru
-                "\u001B[35m", // E → magenta
-                "\u001B[36m", // F → cyan
-                "\u001B[91m", // G → merah terang
-                "\u001B[92m", // H → hijau terang
-                "\u001B[93m", // I → kuning terang
-                "\u001B[94m", // J → biru terang
-                "\u001B[95m", // K → magenta terang (exit bila ingin ditampilkan)
-                "\u001B[96m", // L → cyan terang
-                "\u001B[37m", // M → putih
-        };
+    private static final String[] ANSI_COLORS = {
+            "\u001B[31m",
+            "\u001B[32m",
+            "\u001B[33m",
+            "\u001B[34m",
+            "\u001B[35m",
+            "\u001B[36m",
+            "\u001B[91m",
+            "\u001B[92m",
+            "\u001B[93m",
+            "\u001B[94m",
+            "\u001B[95m",
+            "\u001B[96m",
+            "\u001B[37m",
+    };
 
     private static String colorize(char ch) {
         if (ch == '.')
             return ".";
         if (ch == 'P')
-            return "\u001B[35mP\u001B[0m"; // primary = ungu
+            return "\u001B[35mP\u001B[0m";
         int idx = (ch - 'A') % ANSI_COLORS.length;
         return ANSI_COLORS[idx] + ch + "\u001B[0m";
     }

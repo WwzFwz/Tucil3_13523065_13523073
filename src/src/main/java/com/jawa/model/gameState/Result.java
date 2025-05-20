@@ -18,7 +18,6 @@ public class Result {
         this.nodesExpanded = nodesExpanded;
     }
 
-    // Getter dan Setter
     public List<Movement> getMoves() {
         return moves;
     }
@@ -42,7 +41,8 @@ public class Result {
     public void setNodesExpanded(int nodesExpanded) {
         this.nodesExpanded = nodesExpanded;
     }
-    public List<Movement> getMovements(){
+
+    public List<Movement> getMovements() {
         return moves;
     }
 }

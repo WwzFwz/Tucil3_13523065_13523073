@@ -18,132 +18,170 @@ import com.jawa.model.gameComponent.Piece;
 import com.jawa.model.gameComponent.Position;
 
 public class IO {
-    public static Board loadFromFile(File file) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String[] dim = br.readLine().trim().split("\\s+");
-        int declaredRows = Integer.parseInt(dim[0]);
-        int declaredCols = Integer.parseInt(dim[1]);
-
-        int pieceCount = Integer.parseInt(br.readLine().trim());
-
-        List<String> allLines = new ArrayList<>();
-        String line;
-        while ((line = br.readLine()) != null) {
-            allLines.add(line);
+    public static class InvalidConfigException extends Exception {
+        public InvalidConfigException(String message) {
+            super(message);
         }
-        br.close();
+    }
 
-        Position exitPos = null;
-        int actualRows = allLines.size();
-        int offsetX = 0;
-        int offsetY = 0;
-        outerLoop: for (int r = 0; r < actualRows; r++) {
-            String currentLine = allLines.get(r);
-            for (int c = 0; c < currentLine.length(); c++) {
-                if (currentLine.charAt(c) == 'K') {
+    public static Board loadFromFile(File file) throws IOException, InvalidConfigException {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-                    boolean isInsideBoard = (r < declaredRows) && (c < declaredCols);
-                    if (r == 0) {
-                        int exitRow = 0;
-                        int exitCol = c;
-                        offsetX = 0;
+            String[] dim = br.readLine().trim().split("\\s+");
+            if (dim.length != 2) {
+                throw new InvalidConfigException("Error at line 1: Expected <row> <col>");
+            }
 
-                        if (declaredCols + 1 <= currentLine.length()) {
+            int declaredRows, declaredCols;
+            try {
+                declaredRows = Integer.parseInt(dim[0]);
+                declaredCols = Integer.parseInt(dim[1]);
+            } catch (NumberFormatException e) {
+                throw new InvalidConfigException("Error at line 1: Row and column must be integers");
+            }
 
-                            if (c == 0) {
+            String secondLine = br.readLine();
+            if (secondLine == null) {
+                throw new InvalidConfigException("Error at line 2: Missing piece count");
+            }
+
+            int pieceCount;
+            try {
+                pieceCount = Integer.parseInt(secondLine.trim());
+            } catch (NumberFormatException e) {
+                throw new InvalidConfigException("Error at line 2: Piece count must be an integer");
+            }
+
+            List<String> allLines = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                allLines.add(line);
+            }
+
+            Position exitPos = null;
+            int actualRows = allLines.size();
+            int offsetX = 0, offsetY = 0;
+            int countK = 0;
+
+            outerLoop: for (int r = 0; r < actualRows; r++) {
+                String currentLine = allLines.get(r);
+                for (int c = 0; c < currentLine.length(); c++) {
+                    if (currentLine.charAt(c) == 'K') {
+                        countK++;
+                        if (countK > 1) {
+                            throw new InvalidConfigException(
+                                    "Error at line " + r + " : Invalid K (more than one K on config)");
+                        }
+                        if (r == 0) {
+                            int exitRow = 0;
+                            int exitCol = c;
+                            offsetX = 0;
+
+                            if (declaredCols + 1 <= currentLine.length()) {
+
+                                if (c == 0) {
+                                    offsetX = 1;
+                                    System.out.println("ll");
+                                    exitCol = c + 1;
+
+                                } else {
+                                    offsetX = 0;
+                                }
+                                offsetY = 0;
+                            } else {
+                                offsetY = 1;
+
+                            }
+
+                            exitPos = new Position(exitRow, exitCol);
+                            System.out.println(exitRow + " " + exitCol);
+                        } else if (c == 0) {
+                            int exitCol = 1;
+                            if (declaredCols + 1 <= currentLine.length()) {
                                 offsetX = 1;
-                                System.out.println("ll");
-                                exitCol = c + 1;
-
+                                exitCol = 1;
                             } else {
                                 offsetX = 0;
+                                exitCol = c;
                             }
                             offsetY = 0;
+                            int exitRow = r;
+                            exitPos = new Position(exitRow, exitCol);
+                            System.out.println(exitRow + " " + exitCol);
                         } else {
-                            offsetY = 1;
-
+                            int exitRow = r;
+                            int exitCol = c;
+                            exitPos = new Position(exitRow, exitCol);
+                            System.out.println(exitRow + " " + exitCol);
                         }
-
-                        exitPos = new Position(exitRow, exitCol);
-                        System.out.println(exitRow + " " + exitCol);
-                    } else if (c == 0) {
-                        int exitCol = 1;
-                        if (declaredCols + 1 <= currentLine.length()) {
-                            offsetX = 1;
-                            exitCol = 1;
-                        } else {
-                            offsetX = 0;
-                            exitCol = c;
-                        }
-                        offsetY = 0;
-                        int exitRow = r;
-                        exitPos = new Position(exitRow, exitCol);
-                        System.out.println(exitRow + " " + exitCol);
-                    } else {
-                        int exitRow = r;
-                        int exitCol = c;
-                        exitPos = new Position(exitRow, exitCol);
-                        System.out.println(exitRow + " " + exitCol);
+                        break outerLoop;
                     }
-
-                    break outerLoop;
-
                 }
             }
-        }
 
-        List<String> boardLines = new ArrayList<>();
-        for (int i = offsetY; i < declaredRows + offsetY; i++) {
-            String rawLine = i < allLines.size() ? allLines.get(i) : "";
-            StringBuilder processedLine = new StringBuilder();
-            for (int c = offsetX; c < declaredCols + offsetX; c++) {
-                if (c < rawLine.length()) {
-                    char ch = rawLine.charAt(c);
-                    processedLine.append(ch == ' ' ? '.' : ch);
-                } else {
-                    processedLine.append('.'); 
+            List<String> boardLines = new ArrayList<>();
+            for (int i = offsetY; i < declaredRows + offsetY; i++) {
+                String rawLine = i < allLines.size() ? allLines.get(i) : "";
+                StringBuilder processedLine = new StringBuilder();
+                for (int c = offsetX; c < declaredCols + offsetX; c++) {
+                    processedLine.append(
+                            (c < rawLine.length()) ? (rawLine.charAt(c) == ' ' ? '.' : rawLine.charAt(c)) : '.');
+                }
+                boardLines.add(processedLine.toString());
+            }
+
+            Board board = new Board(declaredRows, declaredCols, pieceCount);
+            if (exitPos != null)
+                board.setExitPosition(exitPos);
+
+            Map<Character, List<Position>> pieceMap = new HashMap<>();
+            for (int r = 0; r < declaredRows; r++) {
+                String boardRow = boardLines.get(r);
+                for (int c = 0; c < declaredCols; c++) {
+                    char ch = boardRow.charAt(c);
+                    if (ch != '.' && ch != 'K') {
+                        pieceMap.putIfAbsent(ch, new ArrayList<>());
+                        pieceMap.get(ch).add(new Position(r, c));
+                    }
                 }
             }
-            boardLines.add(processedLine.toString());
-        }
 
-        Board board = new Board(declaredRows, declaredCols, pieceCount);
-        if (exitPos != null) {
-            board.setExitPosition(exitPos);
-        }
+            for (Map.Entry<Character, List<Position>> entry : pieceMap.entrySet()) {
+                List<Position> positions = entry.getValue();
+                positions.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
+                Position first = positions.get(0);
+                boolean isHorizontal = positions.size() > 1 &&
+                        positions.get(1).getRow() == first.getRow();
 
+                Piece piece = new Piece(
+                        String.valueOf(entry.getKey()),
+                        first.getRow(), first.getCol(),
+                        positions.size(),
+                        isHorizontal,
+                        entry.getKey() == 'P');
+                board.addPiece(piece);
+            }
 
-        Map<Character, List<Position>> pieceMap = new HashMap<>();
-        for (int r = 0; r < declaredRows; r++) {
-            String boardRow = boardLines.get(r);
-            for (int c = 0; c < declaredCols; c++) {
-                char ch = boardRow.charAt(c);
-                if (ch != '.' && ch != 'K') {
-                    pieceMap.putIfAbsent(ch, new ArrayList<>());
-                    pieceMap.get(ch).add(new Position(r, c));
+            if (board.getPrimaryPiece() == null) {
+                throw new InvalidConfigException("Invalid config : Primary Pieces not found");
+            }
+
+            if (board.getPrimaryPiece().isHorizontal()) {
+                if (board.getPrimaryPiece().getRow() != exitPos.getRow()) {
+                    throw new InvalidConfigException("Invalid config : Primary Piece and exit not alligned");
+                }
+            } else {
+                if (board.getPrimaryPiece().getCol() != exitPos.getCol()) {
+                    throw new InvalidConfigException("Invalid config : Primary Piece and exit not alligned");
                 }
             }
+
+            if (board.getPieces().size() - 1 != pieceCount) {
+                throw new InvalidConfigException("Invalid config : Pieces count wrong");
+            }
+
+            return board;
         }
-
-        for (Map.Entry<Character, List<Position>> entry : pieceMap.entrySet()) {
-            List<Position> positions = entry.getValue();
-            positions.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
-
-            Position first = positions.get(0);
-            boolean isHorizontal = positions.size() > 1 &&
-                    positions.get(1).getRow() == first.getRow();
-
-            Piece piece = new Piece(
-                    String.valueOf(entry.getKey()),
-                    first.getRow(),
-                    first.getCol(),
-                    positions.size(),
-                    isHorizontal,
-                    entry.getKey() == 'P');
-            board.addPiece(piece);
-        }
-
-        return board;
     }
 
     public static void saveResultToFile(Board initialBoard, Result result, File file) throws IOException {
@@ -283,61 +321,5 @@ public class IO {
         }
 
         return result.toString();
-    }
-
-    public static Board loadFromFile(String path) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        String[] dim = br.readLine().split(" ");
-        int rows = Integer.parseInt(dim[0]);
-        int cols = Integer.parseInt(dim[1]);
-
-        int pieceCount = Integer.parseInt(br.readLine());
-
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < rows; i++) {
-            lines.add(br.readLine());
-        }
-        br.close();
-
-        Board board = new Board(rows, cols, pieceCount);
-        char[][] grid = new char[rows][];
-        for (int i = 0; i < rows; i++) {
-            grid[i] = lines.get(i).toCharArray();
-        }
-
-        Map<Character, List<Position>> piecePositions = new HashMap<>();
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < grid[r].length; c++) {
-                char ch = grid[r][c];
-                if (ch == '.')
-                    continue;
-                if (ch == 'K') {
-                    if (r < 0 || r >= rows || c < 0 || c >= cols ||
-                            r == 0 || r == rows - 1 || c == 0 || c == cols - 1) {
-                        board.setExitPosition(new Position(r, c));
-                    }
-                    continue;
-                }
-                piecePositions.putIfAbsent(ch, new ArrayList<>());
-                piecePositions.get(ch).add(new Position(r, c));
-            }
-        }
-
-        for (Map.Entry<Character, List<Position>> entry : piecePositions.entrySet()) {
-            char id = entry.getKey();
-            List<Position> posList = entry.getValue();
-            posList.sort(Comparator.comparingInt(Position::getRow).thenComparingInt(Position::getCol));
-            Position first = posList.get(0);
-
-            boolean isHorizontal = posList.size() > 1 && posList.get(1).getRow() == first.getRow();
-            int length = posList.size();
-            boolean isPrimary = id == 'P';
-
-            Piece piece = new Piece(String.valueOf(id), first.getRow(), first.getCol(), length, isHorizontal,
-                    isPrimary);
-            board.addPiece(piece);
-        }
-
-        return board;
     }
 }
