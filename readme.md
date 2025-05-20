@@ -12,8 +12,8 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 
 
 ## Requirements Opsional (Jika ingin pake extension vs code )
-- Extension JavaFX 
-- Extension Pack for Java 
+- [JavaFX Support](https://marketplace.visualstudio.com/items?itemName=shrey150.javafx-support)
+- [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
 
 ## Requirements Wajib
 -  [JavaFx 17](https://maven.apache.org/download.cgi)
