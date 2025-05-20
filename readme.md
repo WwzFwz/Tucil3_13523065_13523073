@@ -57,7 +57,7 @@ Note :
 ## Struktur File
 ```
 Tuci3_13523065_13523073
-├── bin/
+├
 ├── doc/
 ├── src/
 │     ├── src/main/
