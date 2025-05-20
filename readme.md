@@ -6,8 +6,8 @@
 Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang menggunakan **algoritma Path Finding** dengan teknik . Program ini memiliki fitur utama sebagai berikut:
 
 - Memuat konfigurasi papan dan blok dari file input ".txt".
-- Menyelesaikan rush hour ....
-- Menyimpan solusi ke dalam file teks atau gambar.
+- Menyelesaikan rush hour dengan berbagai macam algoritma dan heuristic
+- Menyimpan solusi ke dalam file teks 
 - Menampilkan solusi secara visual menggunakan **antarmuka grafis (GUI)** berbasis **JavaFX**.
 
 
@@ -16,59 +16,42 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 - Extension Pack for Java 
 
 ## Requirements Wajib
-- JavaFX  ........(nanti kasih link zip / link)
-- Java 23 .........(nanti kasih zip / link)
-- Maven (Tidak perlu, kalau sudah pake extension)  ............(nanti kasih zip / link)
+-  [JavaFx 17](https://maven.apache.org/download.cgi)
+-  [Java 23](https://maven.apache.org/download.cgi)  (Note : Salinlah path tempat anda manruhnya karena dibutuhkan untuk cara menjalankan program selanjutnya)
+-  [Maven](https://maven.apache.org/download.cgi) (Note :Tidak perlu, kalau sudah pake extension) 
 
 ## Cara Menjalankan Program 1 (Jika menggunakan extension vs code)
-1. Pastikan suah mendownload requirement opsional
+1. Pastikan sucah mendownload requirement opsional
 2. Buka src/src/main/java/com/App.java
-3. Tekan Run
+3. Tekan Run pada method main
 
-## Cara Menjalankan Program 2 (Manual Compile and Run Via Cli)
+
+## Cara Menjalankan Program 2 (Menggunakan executable file yang telah ada )
+1. Pastikan sudah mendownload requirement wajib
+2. Masuk ke src 
+```
+cd src
+```
+3. Jalankan executable file
+```
+java --module-path "C:/Program Files/Java/javafx-sdk-21.0.7/lib" --add-modules javafx.controls,javafx.fxml -cp target/classes com.jawa.App
+```
+
+Note :   
+-"C:\Program Files\Java\javafx-sdk-21.0.3\lib" merupakan folder dimana javafx kalian diinstal (path yg saya mont auntuk dicopy sblmnya)
+- "target/classes" dapat diubah sesuai dengan path relative terminal anda berada terhadap folder target/classes, semisal jika anda berada di root project maka bisa diubah menjadi "src/target/classes"
+## Cara Menjalankan Program 3 (Jika ingin compile ulang)
 1. Pastikan sudah mendownload requirement wajib
 2. Masuk ke src
 ```
 cd src
 ```
-3. Jalankan perintah ini
+3. Jalankan perintah ini jika ingin membuat ulang executable file
 ```
 mvn clean javafx:run
 ```
 
 
-## Cara Menjalankan Program 3 (Manual Menggunakan Executable JAR)
-1. Pastikan sudah mendownload requirement wajib
-2. Masuk ke src
-```
-cd src
-```
-3.  Buat jar  (jika ingin buat ulang jar)
-```
-mvn clean package
-```
-
-4. Jalankan jar
-```
-java -jar target/myjavafxapp-1.0-SNAPSHOT.jar
-
-```
-atau bisa juga 
-```
-java --module-path "C:\Program Files\Java\javafx-sdk-21.0.3\lib" \
-     --add-modules javafx.controls,javafx.fxml \
-     --add-opens javafx.base/com.sun.javafx=ALL-UNNAMED \
-     --add-opens javafx.graphics/com.sun.glass.utils=ALL-UNNAMED \
-     --add-opens javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED \
-     -jar bin/App-1.0-SNAPSHOT-shade-plugin.jar
-```
-
-Note :  Kalimat "C:\Program Files\Java\javafx-sdk-21.0.3\lib" bisa diganti dengan path ke javafx sdk yang sesuai yang sudah di download sebelumnya Kalimat "bin/App-1.0-SNAPSHOT-shade-plugin.jar bisa diganti dan disesuaikan tergantung dari lokasi jar file App-1.0-SNAPSHOT-shade-plugin.jar.
-
-
-## Cara Menggunakan Aplikasi 
-1. (Jelasin alur user make app nanti)
-2. 
 
 
 ## Struktur File
@@ -79,7 +62,7 @@ Tuci3_13523065_13523073
 ├── src/
 │     ├── src/main/
 │     │     ├── java/com/jawa
-│     │     │     ├── 
+│     │     │     ├── models // model algoritma yang telah dibuat
 │     │     │     ├── 
 │     │     │     ├── App.java
 |     |     |     ├── PrimaryController.java
