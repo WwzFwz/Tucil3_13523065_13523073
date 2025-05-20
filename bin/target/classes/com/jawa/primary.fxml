@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="700.0" prefWidth="1000.0"  xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jawa.MainController">
+   <left>
+      <VBox styleClass="control-panel" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
+               <children>
+                  <Label styleClass="title-label" text="Control Panel">
+                     <VBox.margin>
+                        <Insets bottom="15.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+                     
+            <Separator>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUploadFile" text="Select File">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+            <HBox alignment="CENTER">
+               <children>
+                     <Label fx:id="fileNameLabel" text="No file selected" />
+               </children>
+            </HBox>
+            
+            <Separator>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Separator>
+            <ComboBox fx:id="algorithmComboBox" maxWidth="1.7976931348623157E308" promptText="Select Algorithm" disable = "true">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </ComboBox>
+               <ComboBox fx:id="heuristicComboBox" maxWidth="1.7976931348623157E308" promptText="Select Heuristic" disable= "true">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="5.0" />
+                     </VBox.margin>
+               </ComboBox>
+            <Button fx:id="solveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSolve" styleClass="solve-button" text="Solve Puzzle" disable = "true">
+               <VBox.margin>
+                  <Insets bottom="15.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSaveSolution" styleClass="save-button" text="Save Solution" disable="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+            <Separator>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Separator>
+            
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="⏮" disable="true" />
+                  <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#handlePlayPause" text="▶" disable ="true" />
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" text="⏭" disable= "true" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+   
+            <HBox alignment="CENTER">
+               <children>        
+                  <Label text="Solution Steps" />
+               </children>
+            </HBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox>
+                     <children>
+                        <ListView fx:id="stepsListView" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </content>
+               <VBox.margin>
+                  <Insets bottom="3.0" top="5.0" />
+               </VBox.margin>
+            </ScrollPane>
+            
+            <Pagination fx:id="stepsPagination" maxPageIndicatorCount="5" pageCount="5" />
+            
+            <Label fx:id="statusLabel" text="Ready" textFill="#006400">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </left>
+   <center>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="board-title" text="Game Board">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="20.0" />
+               </VBox.margin>
+            </Label>
+            <Pane fx:id="boardPane" minHeight="300.0" minWidth="300.0"  maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="board-pane" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+               </VBox.margin>
+            </Pane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

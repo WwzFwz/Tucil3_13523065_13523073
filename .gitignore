@@ -12,5 +12,4 @@ target/maven-status/
 
 # Sistem
 .DS_Store
-bin
 test
