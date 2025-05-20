@@ -4,6 +4,7 @@
 # .project
 # .settings/
 
+target/maven-status
 # IDE
 .idea/
 *.iml
