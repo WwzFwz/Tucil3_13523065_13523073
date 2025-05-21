@@ -16,8 +16,8 @@ Program ini adalah sebuah solver untuk permainan ** Puzzle Rush Hour ** yang men
 - [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
 
 ## Requirements Wajib
--  [JavaFx 17](https://maven.apache.org/download.cgi)
--  [Java 23](https://maven.apache.org/download.cgi)  (Note : Salinlah path tempat anda manruhnya karena dibutuhkan untuk cara menjalankan program selanjutnya)
+-  [JavaFx 17](https://gluonhq.com/products/javafx/)
+-  [Java 21](https://www.oracle.com/id/java/technologies/downloads/)  (Note : Salinlah path tempat anda manruhnya karena dibutuhkan untuk cara menjalankan program selanjutnya)
 -  [Maven](https://maven.apache.org/download.cgi) (Note :Tidak perlu, kalau sudah pake extension) 
 
 ## Cara Menjalankan Program 1 (Jika menggunakan extension vs code)
